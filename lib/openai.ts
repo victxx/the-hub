@@ -19,109 +19,16 @@ export async function generateStorySegment(
   narrative: string;
   options: { text: string; consequence: string }[];
 }> {
-  try {
-    const prompt = `
-    Estás creando una aventura interactiva sobre escapar de una cueva con trampas antes de que se acabe el tiempo.
-    
-    Contexto previo: ${context}
-    
-    Situación actual: ${currentSituation}
-    
-    Genera una respuesta en formato JSON con:
-    1. Una narrativa vívida, atmosférica y detallada (máximo 150 palabras)
-    2. Exactamente dos opciones de decisión, cada una con:
-       - Un texto breve para el botón
-       - Una descripción de la consecuencia (que se usará para la próxima situación)
-    
-    Responde solo con JSON válido con el siguiente formato:
-    {
-      "narrative": "Texto narrativo detallado de la situación actual",
-      "options": [
-        {
-          "text": "Opción A (texto para botón)",
-          "consequence": "Descripción de lo que pasa si se elige esta opción"
-        },
-        {
-          "text": "Opción B (texto para botón)",
-          "consequence": "Descripción de lo que pasa si se elige esta opción"
-        }
-      ]
-    }
-    `;
-
-    if (!apiKey) {
-      // Si no hay API key, devuelve datos de muestra
+  // Temporalmente usamos solo datos mock para asegurar que funcione
       return getMockStoryData(currentSituation);
-    }
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo-0125", // Puedes cambiar a gpt-4 para mejor calidad
-      messages: [
-        {
-          role: "system",
-          content: "Eres un maestro narrador de historias de aventuras en cuevas. Crea narrativas inmersivas y opciones interesantes que afecten significativamente el desarrollo de la historia."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" }
-    });
-
-    const content = response.choices[0]?.message?.content || '';
-    const parsedContent = JSON.parse(content);
-    
-    return {
-      narrative: parsedContent.narrative,
-      options: parsedContent.options
-    };
-  } catch (error) {
-    console.error("Error al generar la historia:", error);
-    return getMockStoryData(currentSituation);
-  }
 }
 
 export async function isEndingSuccessful(situation: string): Promise<boolean> {
-  try {
-    const prompt = `
-    Basado en esta situación: "${situation}"
-    
-    Determina si el jugador ha escapado exitosamente de la cueva o no.
-    Responde solo con JSON en este formato:
-    { "success": true } o { "success": false }
-    `;
-
-    if (!apiKey) {
-      // Si no hay API key, determina el éxito basado en palabras clave
-      return situation.toLowerCase().includes('salida') || 
+  // Determina el éxito basado en palabras clave
+  return situation.toLowerCase().includes('escapado') || 
+         situation.toLowerCase().includes('salida') || 
              situation.toLowerCase().includes('escapar') || 
              situation.toLowerCase().includes('exterior');
-    }
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo-0125",
-      messages: [
-        {
-          role: "system",
-          content: "Eres un juez imparcial que evalúa si las condiciones describen una salida exitosa de la cueva."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" }
-    });
-
-    const content = response.choices[0]?.message?.content || '';
-    const parsedContent = JSON.parse(content);
-    
-    return parsedContent.success;
-  } catch (error) {
-    console.error("Error al evaluar el final:", error);
-    return false;
-  }
 }
 
 // Función para proporcionar datos de muestra cuando no hay API key
@@ -132,66 +39,117 @@ function getMockStoryData(currentSituation: string): {
   // Si estamos en la situación inicial
   if (currentSituation.includes("Acabas de entrar a una misteriosa cueva")) {
     return {
-      narrative: "El calor dentro de la cueva se intensifica a medida que avanzas. Las paredes están cubiertas de extraños símbolos que parecen brillar con luz propia. Al fondo, puedes ver una bifurcación en el camino. A la izquierda, un túnel estrecho del que emana una suave brisa; a la derecha, un camino más amplio iluminado por un resplandor rojizo.",
+      narrative: "> SYSTEM BOOT SEQUENCE INITIATED\n\nThe heat hits you first - a wave of scorching air that makes your skin tingle. Around you, digital flames lick at the edges of reality, casting everything in a flickering orange glow.\n\nThe screen flashes: \"WELCOME TO THE TRIAL OF FIRE. ONLY THE WORTHY SHALL PASS.\"\n\nA warning appears: \"DANGER: Temperature rising to critical levels. Choose your path carefully.\"",
       options: [
         { 
-          text: "Tomar el túnel estrecho", 
-          consequence: "Te deslizas por el túnel estrecho, sintiendo la brisa fresca en tu rostro. A medida que avanzas, el pasaje se hace más angosto, pero la temperatura parece descender." 
+          text: "BRAVE THE FLAMES", 
+          consequence: "You step forward, feeling the heat intensify. The digital fire dances around you, almost alive in its movements. As you press on, the path narrows and the temperature continues to rise." 
         },
         { 
-          text: "Seguir el camino iluminado", 
-          consequence: "Avanzas por el camino más amplio, guiado por el resplandor rojizo. El calor aumenta considerablemente y pronto descubres que la luz proviene de lo que parece ser un río de lava que fluye bajo una pasarela de piedra." 
+          text: "SEEK SHELTER", 
+          consequence: "You quickly move toward what appears to be a safer area, where the flames are less intense. The air is still hot, but more bearable here. You notice strange symbols etched into the rock walls." 
         }
       ]
     };
   }
   
-  // Si estamos en el túnel estrecho
-  if (currentSituation.includes("túnel estrecho")) {
+  // Si bravamos las llamas
+  if (currentSituation.includes("You step forward, feeling the heat intensify")) {
     return {
-      narrative: "El túnel se estrecha tanto que apenas puedes avanzar arrastrándote. El aire se vuelve más fresco, lo que te da esperanza. De repente, el suelo cede y caes a una cámara inferior. Al levantarte, notas dos salidas: una escalera tallada en la piedra que sube, y un pasadizo inundado parcialmente con agua que parece descender.",
+      narrative: "> THERMAL SYSTEMS: CRITICAL\n\nThe flames rise higher around you, forming patterns that seem almost deliberate. The heat is nearly unbearable, but you notice something strange - the fire parts slightly where you walk, as if testing your resolve.\n\nAhead, a wall of pure flame blocks your path. Through it, you can faintly see what looks like an exit portal.\n\nA terminal flickers nearby, its screen displaying ancient code sequences.",
       options: [
         { 
-          text: "Subir por la escalera", 
-          consequence: "Asciendes por la escalera de piedra, que serpentea hacia arriba. Después de varios minutos de arduo ascenso, llegas a una pequeña cámara con grabados en las paredes y lo que parece ser un altar antiguo." 
+          text: "DASH THROUGH THE FIRE WALL", 
+          consequence: "Taking a deep breath, you sprint directly into the wall of flames. For a moment, there is only searing heat and blinding light. Then, suddenly, cool air - you've made it through! The exit portal glows before you, your escape route now clear. Has escapado." 
         },
         { 
-          text: "Seguir el pasaje inundado", 
-          consequence: "Te adentras en el pasaje inundado, con el agua fría llegándote hasta las rodillas. El camino desciende gradualmente y notas que la corriente se hace más fuerte." 
+          text: "EXAMINE THE TERMINAL", 
+          consequence: "The terminal's screen shows lines of ancient code - a firewall subroutine. As you study it, you realize you might be able to hack it and create a safe passage. Your fingers move across the interface, altering the code structure." 
         }
       ]
     };
   }
   
-  // Si seguimos el camino iluminado
-  if (currentSituation.includes("río de lava")) {
+  // Si examinamos el terminal
+  if (currentSituation.includes("The terminal's screen shows lines of ancient code")) {
     return {
-      narrative: "La pasarela sobre el río de lava es estrecha y notas que algunas secciones parecen inestables. El calor es sofocante y las gotas de sudor evaporan antes de caer al suelo. Al final de la pasarela, ves una gran puerta de piedra con inscripciones y, a un lado, una pequeña abertura en la pared por la que podrías colarte.",
+      narrative: "> FIREWALL PROTOCOL: BREACHED\n\nAs you finish the last line of code, the terminal emits a series of beeps. The wall of flame before you flickers, parts slightly, creating a narrow corridor of cooler air.\n\nWarning messages flash across the terminal: \"UNAUTHORIZED BYPASS DETECTED. SECURITY PROTOCOLS ENGAGED.\" \n\nThe ground trembles beneath your feet. You have limited time before the system locks down completely.",
       options: [
         { 
-          text: "Examinar la puerta de piedra", 
-          consequence: "Te acercas a la imponente puerta. Las inscripciones parecen ser algún tipo de acertijo o mecanismo. Mientras las examinas, descubres que ciertas partes pueden presionarse, como si fueran botones." 
+          text: "SPRINT THROUGH THE OPENING", 
+          consequence: "You dash through the corridor in the flames. The heat licks at your sides but can't touch you. Just as the opening begins to close, you leap through to the other side, landing safely. The exit portal awaits just ahead. Has escapado." 
         },
         { 
-          text: "Deslizarte por la abertura", 
-          consequence: "Te deslizas por la pequeña abertura, raspándote los hombros y rodillas. El pasaje es tan angosto que casi no puedes respirar, pero finalmente emerges a una cámara más fresca y oscura." 
+          text: "ATTEMPT TO STABILIZE THE BREACH", 
+          consequence: "You turn back to the terminal, fingers flying over the interface trying to lock the breach open. A sudden surge of energy from the system overwhelms your attempt. The terminal explodes in a shower of sparks, and the flames rush in from all sides. Has muerto." 
         }
       ]
     };
   }
   
-  // Si hemos subido por la escalera
-  if (currentSituation.includes("altar antiguo")) {
+  // Si buscamos refugio
+  if (currentSituation.includes("You quickly move toward what appears to be a safer area")) {
     return {
-      narrative: "El altar parece ser algún tipo de mecanismo. Tiene cuatro símbolos tallados: fuego, agua, tierra y aire. Al centro hay un hueco que parece esperar algún tipo de ofrenda o llave. Un pasaje estrecho continúa detrás del altar, y notas una luz tenue que podría ser la salida de la cueva.",
+      narrative: "> SCAN COMPLETE: HIDDEN PATHWAYS DETECTED\n\nThe symbols on the walls begin to glow as you examine them. They seem to be some kind of ancient programming language. The pattern suggests a map or navigation system.\n\nA soft humming emanates from deeper within this sheltered area. Following the sound, you discover a small chamber with a crystal interface floating in the center.\n\nThe interface displays two distinct energy signatures.",
       options: [
         { 
-          text: "Investigar los símbolos", 
-          consequence: "Al tocar los símbolos en cierto orden (aire, agua, tierra, fuego), sientes un temblor y el altar se mueve, revelando un pasaje secreto que desciende." 
+          text: "INTERACT WITH THE CRYSTAL", 
+          consequence: "You reach out and touch the crystal interface. It responds to your touch, the energy within it shifting and flowing. A holographic map materializes, showing a hidden path through the Trial of Fire. The crystal cools in your hand, offering protection from the flames." 
         },
         { 
-          text: "Seguir hacia la luz", 
-          consequence: "Te diriges hacia la luz, atravesando el estrecho pasaje que se curva y asciende. Después de varios minutos, ¡la luz se intensifica! Has encontrado la salida de la cueva y escapado a salvo." 
+          text: "FOLLOW THE SYMBOLS' GUIDANCE", 
+          consequence: "Tracing the pattern of symbols with your eyes, you begin to walk a specific path they seem to indicate. The temperature drops noticeably as you follow this invisible route, carefully stepping from one marked spot to another." 
+        }
+      ]
+    };
+  }
+  
+  // Si interactuamos con el cristal
+  if (currentSituation.includes("You reach out and touch the crystal interface")) {
+    return {
+      narrative: "> THERMAL SHIELD: ACTIVATED\n\nThe crystal melds to your palm, forming a protective gauntlet around your hand. The holographic map projects from it, showing your position and a clear path toward the exit.\n\nArmed with this new protection, you step back into the main chamber. The flames still rage, but now they cannot touch you while you hold the crystal.\n\nThe map indicates two possible routes: a direct path through the most intense flames, or a longer route around the perimeter where the fire is less severe.",
+      options: [
+        { 
+          text: "TAKE THE DIRECT PATH", 
+          consequence: "Trusting in the crystal's protection, you stride confidently through the heart of the inferno. The shield holds, keeping you safe as you navigate straight to the exit portal. In minutes, you've reached it - the way out is clear. Has escapado." 
+        },
+        { 
+          text: "CHOOSE THE SAFER PERIMETER", 
+          consequence: "You opt for caution, following the longer route around the edge of the chamber. As you're halfway around, the crystal begins to pulse with warning lights. Its power is depleting faster than expected in the extreme heat." 
+        }
+      ]
+    };
+  }
+  
+  // Si elegimos el perímetro más seguro
+  if (currentSituation.includes("You opt for caution, following the longer route")) {
+    return {
+      narrative: "> WARNING: SHIELD INTEGRITY AT 15%\n\nThe crystal gauntlet flickers, its protective field weakening with each step. The map still shows your position, but the display is becoming unstable.\n\nAhead, you can see the exit portal, but between you and it is a final stretch of intense flame. The crystal might not last long enough to protect you all the way through.\n\nTo your left, you notice what appears to be a cooling station - perhaps it could recharge the crystal, but it would mean a detour.",
+      options: [
+        { 
+          text: "MAKE A RUN FOR THE EXIT", 
+          consequence: "Deciding there's no time to waste, you sprint toward the exit portal. The crystal's shield flickers and fails just as you reach the wall of flame. You feel the heat sear through you for a brief, terrible moment - then you're through, tumbling out into safety. Has escapado." 
+        },
+        { 
+          text: "DETOUR TO THE COOLING STATION", 
+          consequence: "You veer toward the cooling station, hoping to recharge the crystal. As you reach it, the system triggers a lockdown. Steel barriers slam down, trapping you. The flames slowly encroach as the oxygen is systematically removed from your section. Has muerto." 
+        }
+      ]
+    };
+  }
+  
+  // Si seguimos la guía de los símbolos
+  if (currentSituation.includes("Tracing the pattern of symbols with your eyes")) {
+    return {
+      narrative: "> ANCIENT PATHWAY: DISCOVERED\n\nThe temperature continues to drop as you follow the invisible path. The symbols seem to be guiding you through some kind of safe zone in the Trial of Fire.\n\nAs you continue, you reach a large circular chamber. In the center stands a pillar of pure data energy, shooting up through the ceiling. The exit portal is visible on the far side of the chamber.\n\nThe symbols lead in two directions from here: one path circles around the energy pillar, while another seems to lead directly through it.",
+      options: [
+        { 
+          text: "CIRCLE AROUND THE PILLAR", 
+          consequence: "Following the symbols, you carefully make your way around the energy pillar. As you approach the exit, the system suddenly recognizes your presence. 'CANDIDATE VERIFIED. ACCESS GRANTED.' The portal stabilizes, allowing you safe passage. Has escapado." 
+        },
+        { 
+          text: "WALK THROUGH THE ENERGY PILLAR", 
+          consequence: "Trusting the ancient symbols, you step directly into the pillar of energy. Your body tingles as data flows through you, reading, scanning - judging. For a moment, you're suspended in pure information, before being violently rejected. The system has deemed you unworthy. Has muerto." 
         }
       ]
     };
@@ -199,15 +157,15 @@ function getMockStoryData(currentSituation: string): {
   
   // Situación por defecto si no coincide con ninguna específica
   return {
-    narrative: "Te encuentras en una sección inexplorada de la cueva. El aire está cargado de misterio y tensión. Debes tomar una decisión rápidamente para continuar tu aventura.",
+    narrative: "> SYSTEM ANOMALY DETECTED\n\nThe digital landscape around you shifts unpredictably. The fire takes strange new forms, creating patterns that seem to respond to your thoughts.\n\nA voice echoes through the chamber: \"TRIAL PARAMETERS CORRUPTED. RECALIBRATING.\"\n\nAs the environment stabilizes, you find yourself faced with two doorways, each pulsing with different colored energy.",
     options: [
       { 
-        text: "Explorar a la izquierda", 
-        consequence: "Te diriges hacia la izquierda, adentrándote en un pasaje que parece descender más profundamente en la tierra." 
+        text: "ENTER THE BLUE DOORWAY", 
+        consequence: "The blue doorway envelops you in cool energy, instantly relieving you from the heat. You find yourself in a serene data stream that carries you safely to the exit portal. The trial recognizes your choice as wisdom. Has escapado." 
       },
       { 
-        text: "Explorar a la derecha", 
-        consequence: "Tomas el camino de la derecha, que parece ascender ligeramente, dándote esperanza de encontrar una salida." 
+        text: "ENTER THE RED DOORWAY", 
+        consequence: "The red doorway intensifies the heat to unbearable levels as you step through. The system voice announces: \"RECALIBRATION FAILED. PURGING ANOMALY.\" You feel your digital consciousness being systematically erased. Has muerto." 
       }
     ]
   };

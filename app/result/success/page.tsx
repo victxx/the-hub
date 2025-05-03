@@ -2,11 +2,31 @@
 
 import { CrtEffect } from "@/components/crt-effect"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useStory } from "@/hooks/use-story"
 
 export default function SuccessResultPage() {
+  const { state } = useStory();
   const [minting, setMinting] = useState(false)
   const [minted, setMinted] = useState(false)
+  const [timeDisplay, setTimeDisplay] = useState("--:--")
+
+  useEffect(() => {
+    // Try to get the time from localStorage
+    const storedTime = localStorage.getItem('successTimeRemaining');
+    
+    if (storedTime) {
+      const timeRemaining = parseInt(storedTime, 10);
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      setTimeDisplay(`${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+    } else if (state.timeRemaining !== null) {
+      // Fallback to state if localStorage doesn't have the value
+      const minutes = Math.floor(state.timeRemaining / 60);
+      const seconds = state.timeRemaining % 60;
+      setTimeDisplay(`${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+    }
+  }, [state.timeRemaining]);
 
   const handleMintNFT = () => {
     setMinting(true)
@@ -36,7 +56,7 @@ export default function SuccessResultPage() {
                 You emerged from the inferno unscathed, your spirit tempered by the flames. The Trial of Fire has tested
                 your resolve and found you worthy.
               </p>
-              <p className="text-lg text-orange-400">MISSION COMPLETE: 03:42</p>
+              <p className="text-lg text-orange-400">MISSION COMPLETE: {timeDisplay}</p>
             </div>
           </div>
 

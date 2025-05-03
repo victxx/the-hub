@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation"
 interface GameTimerProps {
   initialTime?: number // in seconds
   onTimeExpired?: () => void
+  onTimeChange?: (timeLeft: number) => void
 }
 
-export function GameTimer({ initialTime = 300, onTimeExpired }: GameTimerProps) {
+export function GameTimer({ initialTime = 300, onTimeExpired, onTimeChange }: GameTimerProps) {
   const router = useRouter()
   const [timeLeft, setTimeLeft] = useState(initialTime)
   const [isActive, setIsActive] = useState(true)
@@ -18,7 +19,14 @@ export function GameTimer({ initialTime = 300, onTimeExpired }: GameTimerProps) 
 
     if (isActive && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1)
+        setTimeLeft((prevTime) => {
+          const newTime = prevTime - 1
+          // Call the onTimeChange callback when time updates
+          if (onTimeChange) {
+            onTimeChange(newTime)
+          }
+          return newTime
+        })
       }, 1000)
     } else if (timeLeft === 0) {
       // Time's up
@@ -33,7 +41,7 @@ export function GameTimer({ initialTime = 300, onTimeExpired }: GameTimerProps) 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isActive, timeLeft, router, onTimeExpired])
+  }, [isActive, timeLeft, router, onTimeExpired, onTimeChange])
 
   // Format time as MM:SS
   const minutes = Math.floor(timeLeft / 60)

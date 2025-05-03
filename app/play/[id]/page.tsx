@@ -18,15 +18,7 @@ export default function PlayPage({ params }: PlayPageProps) {
   const router = useRouter()
   const [timeExpired, setTimeExpired] = useState(false)
   
-  // Situación inicial basada en el ID del cartucho
-  const initialSituation = "Acabas de entrar a una misteriosa cueva con paredes que brillan con un tenue resplandor anaranjado. El aire es cálido y hay un ligero olor a azufre. Un camino se extiende hacia la oscuridad frente a ti.";
-  
-  const { state, fetchNextSegment, chooseOption, resetStory } = useStory(initialSituation);
-  
-  // Al cargar la página, inicia la historia
-  useEffect(() => {
-    fetchNextSegment();
-  }, [fetchNextSegment]);
+  const { state, chooseOption, resetStory, setTimeRemaining } = useStory();
   
   // Cuando se acaba el tiempo
   const handleTimeExpired = () => {
@@ -39,11 +31,16 @@ export default function PlayPage({ params }: PlayPageProps) {
   // Si el juego termina, redirige al resultado apropiado
   useEffect(() => {
     if (state.gameOver) {
+      // Store the time remaining in localStorage before redirecting
+      if (state.success && state.timeRemaining !== null) {
+        localStorage.setItem('successTimeRemaining', state.timeRemaining.toString());
+      }
+      
       setTimeout(() => {
         router.push(state.success ? "/result/success" : "/result/defeat");
       }, 2000);
     }
-  }, [state.gameOver, state.success, router]);
+  }, [state.gameOver, state.success, router, state.timeRemaining]);
 
   return (
     <CrtEffect>
@@ -55,7 +52,8 @@ export default function PlayPage({ params }: PlayPageProps) {
             {!timeExpired && !state.gameOver && (
               <GameTimer 
                 initialTime={300} 
-                onTimeExpired={handleTimeExpired} 
+                onTimeExpired={handleTimeExpired}
+                onTimeChange={setTimeRemaining}
               />
             )}
           </div>
@@ -87,8 +85,8 @@ export default function PlayPage({ params }: PlayPageProps) {
               ) : timeExpired ? (
                 <>
                   <p className="text-red-500 text-2xl mb-4">¡TIEMPO AGOTADO!</p>
-                  <p className="mb-4">El calor se vuelve insoportable mientras las llamas virtuales consumen todo a tu alrededor.</p>
-                  <p className="mb-4">La cueva colapsa sobre ti, y la simulación termina abruptamente.</p>
+                  <p className="mb-4">El calor se vuelve insoportable mientras las llamas consumen todo a tu alrededor.</p>
+                  <p className="mb-4">La cueva colapsa sobre ti, has muerto.</p>
                 </>
               ) : state.gameOver ? (
                 <p className="mb-4">
@@ -105,7 +103,7 @@ export default function PlayPage({ params }: PlayPageProps) {
                       <p className="italic mb-2">Decisión anterior: {state.storyHistory[state.storyHistory.length - 1].chosenOption}</p>
                     </div>
                   )}
-                  <p className="mb-4">{state.currentSegment?.narrative || initialSituation}</p>
+                  <p className="mb-4">{state.currentSegment?.narrative}</p>
                 </>
               )}
             </div>

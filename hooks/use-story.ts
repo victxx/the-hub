@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 interface StoryOption {
   text: string;
@@ -8,12 +9,13 @@ interface StoryOption {
 interface StorySegment {
   narrative: string;
   options: StoryOption[];
+  outcome?: string;
 }
 
 export interface StoryState {
   loading: boolean;
-  context: string;
-  currentSituation: string;
+  sessionId: string;
+  currentStep: number;
   storyHistory: {
     narrative: string;
     chosenOption: string | null;
@@ -22,21 +24,31 @@ export interface StoryState {
   error: string | null;
   gameOver: boolean;
   success: boolean | null;
+  timeRemaining: number | null;
 }
 
-export const useStory = (initialSituation: string) => {
+export const useStory = () => {
+  // Creamos un ID de sesión único para el jugador
+  const [sessionId] = useState(() => uuidv4());
+  
   const [state, setState] = useState<StoryState>({
     loading: true,
-    context: "",
-    currentSituation: initialSituation,
+    sessionId,
+    currentStep: 0,
     storyHistory: [],
     currentSegment: null,
     error: null,
     gameOver: false,
-    success: null
+    success: null,
+    timeRemaining: null
   });
 
-  const fetchNextSegment = useCallback(async () => {
+  // Iniciar la historia cuando se carga el componente
+  useEffect(() => {
+    startStory();
+  }, []);
+
+  const startStory = useCallback(async () => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     
     try {
@@ -46,8 +58,8 @@ export const useStory = (initialSituation: string) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          context: state.context,
-          currentSituation: state.currentSituation,
+          sessionId: state.sessionId,
+          action: 'start',
         }),
       });
 
@@ -60,22 +72,19 @@ export const useStory = (initialSituation: string) => {
       setState(prev => ({
         ...prev,
         loading: false,
+        currentStep: 1,
         currentSegment: data,
-        context: prev.context + (prev.context ? "\n\n" : "") + 
-                 prev.currentSituation + (prev.currentSituation ? "\n\n" : ""),
-        storyHistory: prev.storyHistory.length === 0 
-          ? [{ narrative: data.narrative, chosenOption: null }] 
-          : prev.storyHistory,
+        storyHistory: [{ narrative: data.narrative, chosenOption: null }],
       }));
     } catch (error) {
-      console.error('Error en fetchNextSegment:', error);
+      console.error('Error en startStory:', error);
       setState(prev => ({ 
         ...prev, 
         loading: false, 
         error: error instanceof Error ? error.message : 'Error desconocido'
       }));
     }
-  }, [state.context, state.currentSituation]);
+  }, [state.sessionId]);
 
   const chooseOption = useCallback(async (optionIndex: number) => {
     if (!state.currentSegment || optionIndex >= state.currentSegment.options.length) {
@@ -83,12 +92,10 @@ export const useStory = (initialSituation: string) => {
     }
     
     const chosenOption = state.currentSegment.options[optionIndex];
-    const newSituation = chosenOption.consequence;
     
     setState(prev => ({
       ...prev,
       loading: true,
-      currentSituation: newSituation,
       storyHistory: [
         ...prev.storyHistory,
         { 
@@ -98,26 +105,58 @@ export const useStory = (initialSituation: string) => {
       ],
     }));
 
-    // Verificar si este es un final
     try {
-      const checkEndingResponse = await fetch(`/api/story?situation=${encodeURIComponent(newSituation)}`);
+      const response = await fetch('/api/story', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          sessionId: state.sessionId,
+          action: optionIndex === 0 ? 'optionA' : 'optionB',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener el segmento de la historia');
+      }
+
+      const data = await response.json();
       
-      if (checkEndingResponse.ok) {
-        const { success } = await checkEndingResponse.json();
+      // Incrementar el paso actual
+      const nextStep = state.currentStep + 1;
+      
+      // Verificar si el juego ha terminado basado en el outcome
+      if (data.outcome === 'death' || data.outcome === 'escaped') {
+        // Verificar si el usuario ha escapado con éxito
+        const checkEndingResponse = await fetch(`/api/story?outcome=${data.outcome}`);
         
-        if (success !== undefined) {
+        if (checkEndingResponse.ok) {
+          const { success } = await checkEndingResponse.json();
+          
+          // Keep the current timeRemaining value when game ends
           setState(prev => ({
             ...prev,
             loading: false,
+            currentStep: nextStep,
+            currentSegment: data,
             gameOver: true,
-            success: success,
+            success,
+            // Preserve the current timeRemaining value
+            timeRemaining: prev.timeRemaining
           }));
           return;
         }
       }
       
-      // Si no es un final, continuar con la historia
-      await fetchNextSegment();
+      // Si el juego no ha terminado, continúa
+      setState(prev => ({
+        ...prev,
+        loading: false,
+        currentStep: nextStep,
+        currentSegment: data,
+      }));
+      
     } catch (error) {
       console.error('Error al procesar la opción:', error);
       setState(prev => ({ 
@@ -126,26 +165,42 @@ export const useStory = (initialSituation: string) => {
         error: error instanceof Error ? error.message : 'Error desconocido'
       }));
     }
-  }, [state.currentSegment, fetchNextSegment]);
+  }, [state.currentSegment, state.sessionId, state.currentStep]);
+
+  const setTimeRemaining = useCallback((time: number) => {
+    setState(prev => ({
+      ...prev,
+      timeRemaining: time
+    }));
+  }, []);
 
   const resetStory = useCallback(() => {
+    // Generar un nuevo ID de sesión para comenzar una historia completamente nueva
+    const newSessionId = uuidv4();
+    
+    // Clear any stored time values
+    localStorage.removeItem('successTimeRemaining');
+    
     setState({
       loading: true,
-      context: "",
-      currentSituation: initialSituation,
+      sessionId: newSessionId,
+      currentStep: 0,
       storyHistory: [],
       currentSegment: null,
       error: null,
       gameOver: false,
-      success: null
+      success: null,
+      timeRemaining: null
     });
-    fetchNextSegment();
-  }, [initialSituation, fetchNextSegment]);
+    
+    // Iniciar la nueva historia
+    startStory();
+  }, [startStory]);
 
   return {
     state,
-    fetchNextSegment,
     chooseOption,
-    resetStory
+    resetStory,
+    setTimeRemaining
   };
 }; 

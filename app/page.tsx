@@ -26,12 +26,26 @@ export default function Home() {
           {cartuchos.map((cartucho) => (
             <Cartucho key={cartucho.id} cartucho={cartucho} />
           ))}
+          
+          {/* Cartucho Coming Soon */}
+          <div className="border-4 border-orange-500/50 border-dashed bg-gray-900/50 p-6 rounded-lg relative overflow-hidden">
+            <div className="flex flex-col items-center justify-center h-48">
+              <div className="w-16 h-16 rounded-full border-2 border-dashed border-orange-500/70 flex items-center justify-center mb-4">
+                <PlusIcon className="w-8 h-8 text-orange-500/70" />
+              </div>
+              <p className="text-xl text-orange-500/70 font-bold tracking-wider">NEW CARTUCHO COMING SOON</p>
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-center mt-12">
           <p className="text-center text-orange-300 text-lg">
-            Your Retro Hackathon Project with Web3 Integration
+            created by victorxva with &lt;3 at ETHCincoDeMayo
           </p>
+        </div>
+        
+        <div className="mt-4 text-center text-orange-400/60 text-sm">
+          THE HUB // SYSTEM V0.8.5
         </div>
       </main>
     </CrtEffect>
