@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(var(--background-end-rgb))
+  )
+  rgb(var(--background-start-rgb));
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 30 100% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 20 100% 60%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 35 100% 50%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 30 100% 50%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Courier New", monospace;
+  }
+}
+
+/* Custom color utilities */
+.text-orange-300 {
+  color: #ffb366;
+}
+.text-orange-400 {
+  color: #ff9933;
+}
+.text-orange-500 {
+  color: #ff8000;
+}
+.text-orange-600 {
+  color: #cc6600;
+}
+.text-orange-700 {
+  color: #994c00;
+}
+.bg-orange-300 {
+  background-color: #ffb366;
+}
+.bg-orange-400 {
+  background-color: #ff9933;
+}
+.bg-orange-500 {
+  background-color: #ff8000;
+}
+.bg-orange-600 {
+  background-color: #cc6600;
+}
+.bg-orange-700 {
+  background-color: #994c00;
+}
+.border-orange-300 {
+  border-color: #ffb366;
+}
+.border-orange-400 {
+  border-color: #ff9933;
+}
+.border-orange-500 {
+  border-color: #ff8000;
+}
+.border-orange-600 {
+  border-color: #cc6600;
+}
+.hover\:bg-orange-400:hover {
+  background-color: #ff9933;
+}
+.hover\:bg-orange-500:hover {
+  background-color: #ff8000;
+}
+.hover\:border-orange-400:hover {
+  border-color: #ff9933;
+}
+
+.glow-orange {
+  text-shadow: 0 0 5px #ff8000, 0 0 10px #ff8000, 0 0 15px #ff8000, 0 0 20px #ff8000;
+}
+
+.glow-orange-light {
+  text-shadow: 0 0 5px #ffb366, 0 0 10px #ffb366, 0 0 15px #ffb366, 0 0 20px #ffb366;
+}
+
+.arcade-button {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.2s ease;
+}
+
+.arcade-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem 0.5rem 0 0;
+  transform: translateZ(-1px);
+}
+
+.arcade-button:active {
+  transform: translateY(4px);
+}
+
+.pixel-corners {
+  clip-path: polygon(
+    0% 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0%,
+    calc(100% - 8px) 0%,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 4px),
+    4px calc(100% - 4px),
+    4px calc(100% - 8px),
+    0% calc(100% - 8px)
+  );
+}
+
+.dashed-border {
+  background-image: repeating-linear-gradient(to right, #ff8000 0%, #ff8000 50%, transparent 50%, transparent 100%);
+  background-size: 20px 1px;
+  background-repeat: repeat-x;
+}
+
+.dashed-border-vertical {
+  background-image: repeating-linear-gradient(to bottom, #ff8000 0%, #ff8000 50%, transparent 50%, transparent 100%);
+  background-size: 1px 20px;
+  background-repeat: repeat-y;
+}
