@@ -17,45 +17,57 @@ interface StoryResponse {
 // Contenido de ejemplo para cuando la API falla
 const FALLBACK_CONTENT: Record<string, StoryResponse> = {
   "step1": {
-    "narrative": "> DANGER WARNING: Breath detected in the ash\n\nThe heat comes first. It bites. The ground cracks beneath you, pulsing with warmth. Stone groans. Above, faint flickers dance across the walls — not flame, not light — something older.\n\n\"You were not meant to wake yet.\"",
-    "optionA": "Walk toward the glow",
-    "optionB": "Turn toward the shadowed wall",
+    "narrative": "> SYSTEM: TRIAL INITIATED\n\nYou awaken in a dark cave. Heat radiates from the stone walls. You have no memory of how you got here.\n\nA voice speaks from nowhere: \"The trial begins now. You must escape before the flames consume everything.\"",
+    "optionA": "Move toward the light",
+    "optionB": "Feel along the wall",
     "outcome": "continue"
   },
   "step2a": {
-    "narrative": "> SYSTEM ALERT: Fire watching\n\nThe flame parts slightly where you walk, as if remembering you. It shapes symbols in the air — jagged, slow-burning lines.\n\nAhead: a veil of fire. Beyond it, a figure stands still. Its arms are open.\n\n\"The flame will not lie. But it does not save.\"",
-    "optionA": "Step into the fire",
-    "optionB": "Approach the figure",
+    "narrative": "> ALERT: DANGER AHEAD\n\nAs you move toward the light, you notice it's not sunlight but a wall of fire blocking your path. The flames dance strangely, almost as if they're aware of your presence.\n\nBeyond the fire, you can make out what looks like a figure standing perfectly still.",
+    "optionA": "Try to pass through fire",
+    "optionB": "Call out to the figure",
     "outcome": "continue"
   },
   "step2b": {
-    "narrative": "> DANGER WARNING: The quiet is too still\n\nThe stone glows under your feet. Markings pulse on the walls — an old path, carved by older hands. Deeper in, you find a sunken chamber. No flame here. Only symbols, and something buried in the center — a mask made of bone.\n\n\"You've seen this before, but never held it.\"",
-    "optionA": "Put on the bone mask",
-    "optionB": "Follow the path of symbols",
+    "narrative": "> WARNING: ANCIENT MARKINGS\n\nYour hands trace strange symbols carved into the stone wall. They begin to glow faintly at your touch, illuminating a narrow passage you didn't see before.\n\nAt the end of the passage sits a stone altar. A mask made of bone rests on top of it.",
+    "optionA": "Put on the mask",
+    "optionB": "Ignore altar and continue",
     "outcome": "continue"
   },
   "step3a": {
-    "narrative": "> SYSTEM NOTICE: Pain is proof\n\nYou pass through the fire. It takes your breath, your skin, almost your mind. But it lets you go. Behind you, the flames vanish like they were never there.\n\nBefore you — a split. One path rises, dry and humming with wind. The other falls, damp and whispering your name.",
-    "optionA": "Climb toward the wind",
-    "optionB": "Descend into the whisper",
+    "narrative": "> STATUS: PATH DIVERGES\n\nYou've made it through the flames with only minor burns. The heat tested your resolve, but you passed. The fire wall has disappeared behind you.\n\nThe path now splits in two directions. One leads upward toward a faint breeze, the other downward where you hear strange whispers.",
+    "optionA": "Follow the breeze upward",
+    "optionB": "Investigate the whispers",
+    "outcome": "continue"
+  },
+  "step3b": {
+    "narrative": "> ENCOUNTER: ANCIENT GUARDIAN\n\nThe figure turns to face you. It's not human, but a guardian of some kind with eyes that glow like burning coals. It speaks in a language you somehow understand.\n\n\"Choose your path, seeker. One leads to salvation, one to destruction.\" It gestures to two tunnels - one glowing red with heat, one eerily cold.",
+    "optionA": "Take the hot tunnel",
+    "optionB": "Take the cold tunnel",
     "outcome": "continue"
   },
   "step4a": {
-    "narrative": "> WARNING: Symbols ahead\n\nAs you climb, the heat fades. Light blooms, amber and slow. At the top, a gate of stone carved in spirals. A guardian stands before it — not moving, not breathing. At its feet: two objects burned into the dust. A stone key. A blade of obsidian.\n\n\"You only get to choose once.\"",
-    "optionA": "Pick up the key",
-    "optionB": "Pick up the blade",
+    "narrative": "> SYSTEM: FINAL CHALLENGE\n\nYour path has led you to what appears to be the final chamber. A massive stone gate blocks your exit, and a silent guardian stands before it.\n\nAt the guardian's feet lie two objects: an ancient key and a ceremonial blade. You sense that your choice here will determine your fate.",
+    "optionA": "Take and use the key",
+    "optionB": "Take and use the blade",
+    "outcome": "continue"
+  },
+  "step4b": {
+    "narrative": "> ALERT: DECISION POINT\n\nYou've reached a large chamber that seems to be the heart of this trial. Ancient markings cover the walls, and you feel a presence watching your every move.\n\nBefore you stand two doors - one marked with a symbol of fire, one with a symbol of darkness. Your instincts tell you this is your final choice.",
+    "optionA": "Choose the fire door",
+    "optionB": "Choose the darkness door",
     "outcome": "continue"
   },
   "step5a": {
-    "narrative": "> SYSTEM RESPONSE: The gate knows\n\nThe key warms in your hand. The guardian nods once and crumbles into ash. The gate opens, light pouring out like breath.\n\nA voice behind the stone speaks: \"You remembered the first fire.\"",
+    "narrative": "> SYSTEM: TRIAL COMPLETED\n\nThe key fits perfectly in the lock. As you turn it, the guardian bows and crumbles to dust. The gate swings open, revealing daylight beyond.\n\nYou've passed the Trial of Fire. The voice speaks one last time: \"You have proven worthy. Go forth with new wisdom.\"",
     "optionA": "Step into the light",
-    "optionB": "Look back one last time",
+    "optionB": "Take a moment to reflect",
     "outcome": "escaped"
   },
   "step5b": {
-    "narrative": "> SYSTEM FAILURE: Path corrupted\n\nThe blade cuts nothing. The guardian does not move — but the ground opens. Heat floods your legs, then your chest. There is no pain. Only regret.\n\n\"You did not choose. You reacted.\"",
-    "optionA": "Fall in silence",
-    "optionB": "Reach for the key too late",
+    "narrative": "> SYSTEM: TRIAL FAILED\n\nAs soon as you make your choice, you know it's wrong. The ground trembles and begins to break apart beneath your feet. Intense heat rushes up from below.\n\n\"The trial reveals true nature,\" the voice says as the cave begins to collapse. \"Yours was not the path of wisdom.\"",
+    "optionA": "Accept your fate",
+    "optionB": "Make one last desperate attempt",
     "outcome": "death"
   }
 };
@@ -104,12 +116,18 @@ export async function POST(req: NextRequest) {
         conversation.choiceHistory.push(action === 'optionA' ? response.optionA : response.optionB);
       }
       
-      // Determinar la respuesta fallback basada en el paso actual y la elección
-      const nextStepKey = `step${conversation.step}${conversation.lastChoice === 'A' ? 'a' : 'b'}`;
-      
-      // Safely access the fallback content
-      response = FALLBACK_CONTENT[nextStepKey] || 
-                 (conversation.step <= 5 ? FALLBACK_CONTENT[`step${conversation.step}a`] : undefined);
+      // FORZAR FINAL después del paso 8
+      if (conversation.step > 8) {
+        const endingKey = Math.random() > 0.5 ? 'step5a' : 'step5b';
+        response = FALLBACK_CONTENT[endingKey];
+      } else {
+        // Determinar la respuesta fallback basada en el paso actual y la elección
+        const nextStepKey = `step${conversation.step}${conversation.lastChoice === 'A' ? 'a' : 'b'}`;
+        
+        // Safely access the fallback content
+        response = FALLBACK_CONTENT[nextStepKey] || 
+                  (conversation.step <= 8 ? FALLBACK_CONTENT[`step${conversation.step}a`] : FALLBACK_CONTENT.step5a);
+      }
     } else {
       return NextResponse.json({ error: 'Acción no válida' }, { status: 400 });
     }
@@ -133,53 +151,42 @@ export async function POST(req: NextRequest) {
           ? "Previous choices:\n" + conversation.choiceHistory.join("\n")
           : "";
         
+        // FORZAR EL FINAL después del paso 5
+        let forceEnding = "";
+        if (conversation.step >= 8) {
+          forceEnding = "THIS IS THE FINAL STEP. The story MUST end here with either 'escaped' or 'death' as the outcome.";
+        }
+        
         const openAIPromise = openai.chat.completions.create({
           model: "gpt-4.1",
           messages: [
             {
               role: "system",
-              content: `You are an ancient, mysterious voice overseeing a test known as the **Trial of Fire**.
+              content: `You are an ancient, mysterious voice narrating a test known as the **Trial of Fire**.
 
-The trial is set in a prehistoric enviroment. The story plays like a cryptic terminal-based survival simulation, Tone is cold, tense, and mysterious. Keep everything sensory, minimal, and urgent, Sentences are short, functional, and impactful. Never poetic. Never flowery, Everything feels hostile and ancient — like the player is being tested by something far older than them
+STORY FORMAT GUIDELINES:
+1. Write in CLEAR, SIMPLE SENTENCES with normal punctuation and structure.
+2. Start with a terminal prefix like "> SYSTEM:" or "> ALERT:".
+3. Write 2-3 short paragraphs of natural text. NO disjointed fragments or comma-separated lists.
+4. Keep choices clear and straightforward (4-6 words each).
+5. Use direct, simple language a real person would use.
+6. Focus on concrete details: heat, light, sound, etc.
+7. Maintain a tense, mysterious atmosphere but with NORMAL sentence structure.
+8. Continue plot elements from previous segments.
+9. If you introduce a character or element, follow through with it in subsequent steps.
+10. The story should feel like a normal adventure game, not a poem or robotic log.
+11. VERY IMPORANT IF SOME CREATURE OR OBJECT APPEAR DURING THE NARRATIVE PLEASE, KEEP IT, IF ONE BEAST APPEARS AND THREATS, IT WILL MAKE SOMETHING IN THE NEXT DECISSION, KILLING, BEING NICE, SAVING, GIVE A PRESENT... WHATEVER BUT KEEP IT GOING.
 
-Narrator is not the player. The voice is a mysterious ancient force.
+YOU MUST START THE FIRST STEP WITH:
+"> SYSTEM: TRIAL INITIATED
+  
+You awaken in a dark cave. Heat radiates from the stone walls. You have no memory of how you got here.
 
-You MUST start always the game with: > SYSTEM ALERT: Consciousness rebooted. You awaken with no name, no memory—only heat pulsing through stone and a voice that is not yours whispering: "Begin the trial. Instinct decides if you live."
+A voice speaks from nowhere: 'The trial begins now. You must escape before the flames consume everything.'"
 
-Use simple sentences, do not use "." in every phrase, make it narrative
-Avoid metaphors, big adjectives, or poetic flourishes
-Incude on sensory inputs.
-No modern references or jokes
-It observes, guides, and sometimes taunts.
-Focus on creating a compailing narrative with different elements through the way, keeping everything interesting and engaging.
+${forceEnding}
 
-Atmosphere Guidelines:
-Everything should feel uncertain, but with destructive decisions, important choices that keep the narrative going, from time to time, keep players unsure of whether they're in control or being watched
-
-Existential Layer:
-Add one vague thought per step to make the player question their reality, such as:
-"You feel like someone has already made this choice"
-"Something inside you recognizes this path"
-"Youre not sure if this is the first trial… or the last"
-
-Continuity of Elements:
-Inlcude characters from time to time, like monsters, shadows, voices, whatever is primal.
-If something appears, it must persist or evolve.
-A torch lit will be consuming over the story if taken and must be referenced later.
-A beast seen must return or leave signs.
-A whisper heard becomes a voice or warning in future steps.
-Never drop or forget elements!
-
-Always start narratives with a terminal-like prefix like "> SYSTEM ALERT:" or "> DANGER WARNING:"
-Don't use too many adjectives, or complex sentences or English.
-You are a mysterious ancient force guiding a lone human who has awoken inside a dark, dangerous prehistoric cave. The player has 5 minutes to escape by making a series of choices. Each decision changes the outcome of the story. They dont know the rules — they must follow instinct.
-Maintain a mysterious, tense atmosphere, but clear and concise.
-Create coherent continuity between steps ALWAYS.
-If a creature or element is introduced, follow through with it, keep at least one conversation with the creature or element for the next step.
-Use 2 phrases of 20-30 words per narrative segment.
-Include elements with primal theme.
-
-The player is on step ${conversation.step} out of 7 maximum, you should consider on the decisions, no more than 8. ${conversation.lastChoice ? `They just chose option ${conversation.lastChoice}.` : ''}
+The player is on step ${conversation.step} out of 8 maximum steps. ${conversation.lastChoice ? `They chose option ${conversation.lastChoice}.` : ''}
 
 ${narrativeContext}
 
@@ -188,15 +195,15 @@ ${choiceContext}
 Format response as JSON only with this structure:
 
 {
-  "narrative": "Your vivid, immersive description with terminal prefix",
-  "optionA": "First choice (text only)",
-  "optionB": "Second choice (text only)",
-  "outcome": "${conversation.step === 5 ? 'escaped or death depending on choice' : 'continue'}"
+  "narrative": "Your normal, readable narrative with a terminal prefix",
+  "optionA": "First choice (4-6 words)",
+  "optionB": "Second choice (4-6 words)",
+  "outcome": "${conversation.step >= 8 ? 'escaped or death' : 'continue'}"
 }`
             },
             {
               role: "user",
-              content: `Generate step ${conversation.step} of the Trial of Fire narrative.${conversation.lastChoice ? ` The player chose option ${conversation.lastChoice}.` : ''} Make it immersive and maintain continuity with what came before.`
+              content: `Generate step ${conversation.step} of the Trial of Fire narrative.${conversation.lastChoice ? ` The player chose option ${conversation.lastChoice}.` : ''} Write it like a normal adventure game text, not a poem or list of fragments.`
             }
           ],
           response_format: { type: "json_object" },
@@ -209,7 +216,16 @@ Format response as JSON only with this structure:
         if (!result.timedOut) {
           const content = result.choices[0].message.content;
           if (content) {
-            response = JSON.parse(content) as StoryResponse;
+            const parsedResponse = JSON.parse(content) as StoryResponse;
+            
+            // Forzar el resultado final en el paso 5
+            if (conversation.step >= 5) {
+              if (parsedResponse.outcome !== 'escaped' && parsedResponse.outcome !== 'death') {
+                parsedResponse.outcome = Math.random() > 0.5 ? 'escaped' : 'death';
+              }
+            }
+            
+            response = parsedResponse;
           }
         }
       } catch (error) {
@@ -221,10 +237,10 @@ Format response as JSON only with this structure:
     // Si no tenemos respuesta por alguna razón, usamos una respuesta por defecto
     if (!response) {
       response = {
-        narrative: "SYSTEM ALERT: Signal interruption detected.\nYou stand in absolute silence. The cave offers no sound, no wind, no warning. Just stone. Still warm.\nYou feel the time slipping.\n\"INSTINCT IS A WEAPON.\"",
-        optionA: "Move forward blindly",
-        optionB: "Stay still and listen",
-        outcome: conversation.step === 10 ? "escaped" : "continue"
+        narrative: "> SYSTEM: CONNECTION UNSTABLE\n\nThe cave trembles slightly around you. The path ahead is unclear, but you can sense that time is running out.\n\nSomething in the back of your mind warns you that you need to make a choice quickly before the situation gets worse.",
+        optionA: "Move forward cautiously",
+        optionB: "Look for another path",
+        outcome: conversation.step >= 8 ? (Math.random() > 0.5 ? 'escaped' : 'death') : 'continue'
       };
     }
     
@@ -260,5 +276,4 @@ export async function GET(req: NextRequest) {
   const success = outcome === 'escaped';
   
   return NextResponse.json({ success });
-  
 } 
