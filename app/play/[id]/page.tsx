@@ -1,9 +1,11 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { CrtEffect } from "@/components/crt-effect"
 import Link from "next/link"
 import { GameTimer } from "@/components/game-timer"
 import { useRouter } from "next/navigation"
+import { useStory } from "@/hooks/use-story"
 
 interface PlayPageProps {
   params: {
@@ -14,16 +16,34 @@ interface PlayPageProps {
 export default function PlayPage({ params }: PlayPageProps) {
   const { id } = params
   const router = useRouter()
-
-  const handleOptionClick = (option: string) => {
-    // In a real app, this would process the choice and determine outcome
-    // For now, we'll just simulate success for option A and defeat for option B
-    if (option === "A") {
-      router.push("/result/success")
-    } else {
-      router.push("/result/defeat")
+  const [timeExpired, setTimeExpired] = useState(false)
+  
+  // Situación inicial basada en el ID del cartucho
+  const initialSituation = "Acabas de entrar a una misteriosa cueva con paredes que brillan con un tenue resplandor anaranjado. El aire es cálido y hay un ligero olor a azufre. Un camino se extiende hacia la oscuridad frente a ti.";
+  
+  const { state, fetchNextSegment, chooseOption, resetStory } = useStory(initialSituation);
+  
+  // Al cargar la página, inicia la historia
+  useEffect(() => {
+    fetchNextSegment();
+  }, [fetchNextSegment]);
+  
+  // Cuando se acaba el tiempo
+  const handleTimeExpired = () => {
+    setTimeExpired(true);
+    setTimeout(() => {
+      router.push("/result/defeat");
+    }, 2000);
+  };
+  
+  // Si el juego termina, redirige al resultado apropiado
+  useEffect(() => {
+    if (state.gameOver) {
+      setTimeout(() => {
+        router.push(state.success ? "/result/success" : "/result/defeat");
+      }, 2000);
     }
-  }
+  }, [state.gameOver, state.success, router]);
 
   return (
     <CrtEffect>
@@ -32,7 +52,12 @@ export default function PlayPage({ params }: PlayPageProps) {
           {/* Header with timer */}
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl md:text-3xl font-bold text-orange-500 glow-orange">TRIAL OF FIRE</h1>
-            <GameTimer initialTime={300} /> {/* 5 minutes = 300 seconds */}
+            {!timeExpired && !state.gameOver && (
+              <GameTimer 
+                initialTime={300} 
+                onTimeExpired={handleTimeExpired} 
+              />
+            )}
           </div>
 
           {/* Game screen */}
@@ -55,33 +80,51 @@ export default function PlayPage({ params }: PlayPageProps) {
 
             {/* Narrative text */}
             <div className="relative z-10 text-lg md:text-xl leading-relaxed mb-8 text-orange-300">
-              <p className="mb-4">&gt; SYSTEM BOOT SEQUENCE INITIATED</p>
-              <p className="mb-4">
-                The heat hits you first - a wave of scorching air that makes your skin tingle. Around you, digital
-                flames lick at the edges of reality, casting everything in a flickering orange glow.
-              </p>
-              <p className="mb-4">The screen flashes: "WELCOME TO THE TRIAL OF FIRE. ONLY THE WORTHY SHALL PASS."</p>
-              <p className="mb-4">
-                A warning appears: "DANGER: Temperature rising to critical levels. Choose your path carefully."
-              </p>
+              {state.loading ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="inline-block h-8 w-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : timeExpired ? (
+                <>
+                  <p className="text-red-500 text-2xl mb-4">¡TIEMPO AGOTADO!</p>
+                  <p className="mb-4">El calor se vuelve insoportable mientras las llamas virtuales consumen todo a tu alrededor.</p>
+                  <p className="mb-4">La cueva colapsa sobre ti, y la simulación termina abruptamente.</p>
+                </>
+              ) : state.gameOver ? (
+                <p className="mb-4">
+                  {state.success 
+                    ? "¡Has logrado escapar de la cueva! La luz del exterior te saluda mientras emerges victorioso."
+                    : "Tu viaje ha llegado a su fin, atrapado en las profundidades de la cueva para siempre."}
+                </p>
+              ) : state.error ? (
+                <p className="text-red-500">Error: {state.error}</p>
+              ) : (
+                <>
+                  {state.storyHistory.length > 1 && (
+                    <div className="mb-6 opacity-60 pb-4 border-b border-orange-500/30">
+                      <p className="italic mb-2">Decisión anterior: {state.storyHistory[state.storyHistory.length - 1].chosenOption}</p>
+                    </div>
+                  )}
+                  <p className="mb-4">{state.currentSegment?.narrative || initialSituation}</p>
+                </>
+              )}
             </div>
           </div>
 
           {/* Option buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <button
-              onClick={() => handleOptionClick("A")}
-              className="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 px-6 rounded-md text-xl tracking-wider transition-all hover:scale-105"
-            >
-              BRAVE THE FLAMES
-            </button>
-            <button
-              onClick={() => handleOptionClick("B")}
-              className="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 px-6 rounded-md text-xl tracking-wider transition-all hover:scale-105"
-            >
-              SEEK SHELTER
-            </button>
-          </div>
+          {!state.loading && !timeExpired && !state.gameOver && state.currentSegment && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {state.currentSegment.options.map((option, index) => (
+                <button
+                  key={index}
+                  onClick={() => chooseOption(index)}
+                  className="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-4 px-6 rounded-md text-xl tracking-wider transition-all hover:scale-105"
+                >
+                  {option.text}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Return button */}
           <div className="text-center">

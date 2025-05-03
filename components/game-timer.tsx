@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation"
 
 interface GameTimerProps {
   initialTime?: number // in seconds
+  onTimeExpired?: () => void
 }
 
-export function GameTimer({ initialTime = 300 }: GameTimerProps) {
+export function GameTimer({ initialTime = 300, onTimeExpired }: GameTimerProps) {
   const router = useRouter()
   const [timeLeft, setTimeLeft] = useState(initialTime)
   const [isActive, setIsActive] = useState(true)
@@ -20,14 +21,19 @@ export function GameTimer({ initialTime = 300 }: GameTimerProps) {
         setTimeLeft((prevTime) => prevTime - 1)
       }, 1000)
     } else if (timeLeft === 0) {
-      // Time's up - redirect to defeat page
-      router.push("/result/defeat")
+      // Time's up
+      if (onTimeExpired) {
+        onTimeExpired()
+      } else {
+        // Si no se proporciona callback, redirigir a página de derrota por defecto
+        router.push("/result/defeat")
+      }
     }
 
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isActive, timeLeft, router])
+  }, [isActive, timeLeft, router, onTimeExpired])
 
   // Format time as MM:SS
   const minutes = Math.floor(timeLeft / 60)
