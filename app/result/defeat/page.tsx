@@ -2,54 +2,11 @@
 
 import { CrtEffect } from "@/components/crt-effect"
 import Link from "next/link"
-import { useState } from "react"
-import { registerCartucho } from "@/lib/contract"
-import { useAccount } from "wagmi"
-import { toast } from "sonner"
 import { Logo } from "@/components/logo"
+import { MintNFTButton } from "@/components/mint-nft-button"
+import { NetworkSwitcher } from "@/components/network-switcher"
 
 export default function DefeatResultPage() {
-  const [minting, setMinting] = useState(false)
-  const [minted, setMinted] = useState(false)
-  const [txHash, setTxHash] = useState<string | null>(null)
-  const { address } = useAccount()
-
-  const handleMintNFT = async () => {
-    if (!address) {
-      toast.error("Please connect your wallet to mint an NFT");
-      return;
-    }
-    
-    setMinting(true);
-    
-    try {
-      // IPFS CID suffix of the JSON metadata of the NFT (would need to be stored on IPFS first)
-      const cidSuffix = "bafybeihsvpxlhwzb4xzqfvqm7gyxaqgqkvzkerkf563q6evubage2v2dna.json";
-      
-      // Allow commercial use, disallow derivative works, expire in 30 days
-      const allowCommercialUse = true;
-      const allowDerivativeWorks = false;
-      const expiry = Math.floor(Date.now()/1000) + 30*24*3600; // 30 days from now
-      
-      const hash = await registerCartucho(
-        address,             // The connected user's address
-        cidSuffix,           // IPFS CID suffix
-        allowCommercialUse,  // Allow commercial use
-        allowDerivativeWorks, // Don't allow derivative works
-        expiry               // Expiry timestamp
-      );
-      
-      setTxHash(hash);
-      setMinted(true);
-      toast.success("NFT minted successfully!");
-    } catch (error) {
-      console.error("Error minting NFT:", error);
-      toast.error("Failed to mint NFT. Please try again.");
-    } finally {
-      setMinting(false);
-    }
-  };
-
   return (
     <CrtEffect>
       <main className="min-h-screen bg-black text-orange-400 font-mono p-4 md:p-8 flex flex-col items-center relative">
@@ -59,8 +16,8 @@ export default function DefeatResultPage() {
         
         <div className="container mx-auto max-w-2xl text-center relative z-10 flex-1 flex flex-col justify-center">
           {/* Result animation */}
-          <div className="mb-12 relative">
-            <div className="text-6xl md:text-8xl font-bold text-red-500/70 glow-orange mb-8 tracking-wider animate-pulse font-psygen">
+          <div className="mb-2 relative">
+            <div className="text-7xl md:text-9xl font-bold text-red-500 glow-red-subtle mb-4 tracking-wider animate-pulse font-psygen">
               DEFEAT
             </div>
           </div>
@@ -76,50 +33,26 @@ export default function DefeatResultPage() {
             </div>
           </div>
 
-          {/* NFT Minting Button */}
-          <div className="mb-8">
-            <button
-              onClick={handleMintNFT}
-              disabled={minting || minted}
-              className={`bg-red-600 hover:bg-red-500 text-white px-8 py-4 rounded-md text-xl font-bold tracking-wider transition-all hover:scale-105 mb-4 ${
-                minting || minted ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {minting ? (
-                <span className="flex items-center justify-center">
-                  <span className="inline-block h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                  MINTING FALLEN NFT...
-                </span>
-              ) : minted ? (
-                "NFT MINTED SUCCESSFULLY!"
-              ) : (
-                "MINT FALLEN NFT"
-              )}
-            </button>
-
-            {minted && (
-              <p className="text-green-400 text-sm">
-                Your FALLEN NFT has been minted to your wallet as a reminder of your defeat.
-                {txHash && (
-                  <a 
-                    href={`https://basecamp.cloud.blockscout.com/tx/${txHash}`} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="underline ml-1"
-                  >
-                    View on Blockscout
-                  </a>
-                )}
-              </p>
-            )}
+          {/* NFT Minting Message */}
+          <div className="mb-8 text-xl text-center text-orange-300 font-psygen glow-orange-subtle">
+            Mint your story NFT on your favorite network!
           </div>
 
-          {/* Return button */}
-          <Link href="/">
-            <button className="bg-orange-600 hover:bg-orange-500 text-white px-8 py-4 rounded-md text-xl font-bold tracking-wider transition-all hover:scale-105">
-              RETURN TO HUB
-            </button>
-          </Link>
+          {/* Network switcher and Mint button */}
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center items-center mb-8">
+            <NetworkSwitcher />
+            <MintNFTButton outcomeType="defeat" />
+          </div>
+          
+          {/* Back to the hub button */}
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="px-8 py-3 text-lg font-bold text-orange-400 border-2 border-orange-400 hover:bg-orange-400/10 transition-colors rounded-md uppercase tracking-widest"
+            >
+              Back to The Hub
+            </Link>
+          </div>
         </div>
       </main>
     </CrtEffect>

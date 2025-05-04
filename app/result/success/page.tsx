@@ -5,39 +5,32 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useStory } from "@/hooks/use-story"
 import { Logo } from "@/components/logo"
+import { MintNFTButton } from "@/components/mint-nft-button"
+import { NetworkSwitcher } from "@/components/network-switcher"
 
 export default function SuccessResultPage() {
   const { state } = useStory();
-  const [minting, setMinting] = useState(false)
-  const [minted, setMinted] = useState(false)
   const [timeDisplay, setTimeDisplay] = useState("--:--")
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
 
   useEffect(() => {
     // Try to get the time from localStorage
     const storedTime = localStorage.getItem('successTimeRemaining');
     
     if (storedTime) {
-      const timeRemaining = parseInt(storedTime, 10);
-      const minutes = Math.floor(timeRemaining / 60);
-      const seconds = timeRemaining % 60;
+      const remainingTime = parseInt(storedTime, 10);
+      setTimeRemaining(remainingTime);
+      const minutes = Math.floor(remainingTime / 60);
+      const seconds = remainingTime % 60;
       setTimeDisplay(`${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
     } else if (state.timeRemaining !== null) {
       // Fallback to state if localStorage doesn't have the value
+      setTimeRemaining(state.timeRemaining);
       const minutes = Math.floor(state.timeRemaining / 60);
       const seconds = state.timeRemaining % 60;
       setTimeDisplay(`${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
     }
   }, [state.timeRemaining]);
-
-  const handleMintNFT = () => {
-    setMinting(true)
-
-    // Simulate minting process
-    setTimeout(() => {
-      setMinting(false)
-      setMinted(true)
-    }, 2000)
-  }
 
   return (
     <CrtEffect>
@@ -48,8 +41,8 @@ export default function SuccessResultPage() {
         
         <div className="container mx-auto max-w-2xl text-center relative z-10 flex-1 flex flex-col justify-center">
           {/* Result animation */}
-          <div className="mb-12 relative">
-            <div className="text-6xl md:text-8xl font-bold text-orange-500/70 glow-orange mb-8 tracking-wider animate-pulse font-psygen">
+          <div className="mb-2 relative">
+            <div className="text-7xl md:text-9xl font-bold text-orange-500 glow-orange-subtle mb-4 tracking-wider animate-pulse font-psygen">
               SURVIVOR
             </div>
           </div>
@@ -65,40 +58,26 @@ export default function SuccessResultPage() {
             </div>
           </div>
 
-          {/* NFT Minting Button */}
-          <div className="mb-8">
-            <button
-              onClick={handleMintNFT}
-              disabled={minting || minted}
-              className={`bg-orange-600 hover:bg-orange-500 text-white px-8 py-4 rounded-md text-xl font-bold tracking-wider transition-all hover:scale-105 mb-4 ${
-                minting || minted ? "opacity-70 cursor-not-allowed" : ""
-              }`}
-            >
-              {minting ? (
-                <span className="flex items-center justify-center">
-                  <span className="inline-block h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                  MINTING SURVIVOR NFT...
-                </span>
-              ) : minted ? (
-                "NFT MINTED SUCCESSFULLY!"
-              ) : (
-                "MINT SURVIVOR NFT"
-              )}
-            </button>
-
-            {minted && (
-              <p className="text-green-400 text-sm">
-                Congratulations! Your SURVIVOR NFT has been minted to your wallet.
-              </p>
-            )}
+          {/* NFT Minting Message */}
+          <div className="mb-8 text-xl text-center text-orange-300 font-psygen glow-orange-subtle">
+            Mint your story NFT on your favorite network!
           </div>
 
-          {/* Return button */}
-          <Link href="/">
-            <button className="bg-orange-600 hover:bg-orange-500 text-white px-8 py-4 rounded-md text-xl font-bold tracking-wider transition-all hover:scale-105">
-              RETURN TO HUB
-            </button>
-          </Link>
+          {/* Network switcher and Mint button */}
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center items-center mb-8">
+            <NetworkSwitcher />
+            <MintNFTButton outcomeType="victory" timeRemaining={timeRemaining} />
+          </div>
+          
+          {/* Back to the hub button */}
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="px-8 py-3 text-lg font-bold text-orange-400 border-2 border-orange-400 hover:bg-orange-400/10 transition-colors rounded-md uppercase tracking-widest"
+            >
+              Back to The Hub
+            </Link>
+          </div>
         </div>
       </main>
     </CrtEffect>

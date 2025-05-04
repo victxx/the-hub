@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Inicializamos el cliente de OpenAI
+// Initialize the OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || ''
 });
@@ -14,7 +14,7 @@ interface StoryResponse {
   outcome: string;
 }
 
-// Contenido de ejemplo para cuando la API falla
+// Example content for when the API fails
 const FALLBACK_CONTENT: Record<string, StoryResponse> = {
   "step1": {
     "narrative": "> SYSTEM: TRIAL INITIATED\n\nYou awaken in a dark cave. Heat radiates from the stone walls. You have no memory of how you got here.\n\nA voice speaks from nowhere: \"The trial begins now. You must escape before the flames consume everything.\"",
@@ -72,7 +72,7 @@ const FALLBACK_CONTENT: Record<string, StoryResponse> = {
   }
 };
 
-// Guardamos el historial de mensajes para cada sesión (en memoria)
+// Store message history for each session (in memory)
 const conversationHistory = new Map<string, {
   step: number;
   lastChoice: string | null;
@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
   try {
     const { sessionId, action } = await req.json();
     
-    // Crear o recuperar la conversación para esta sesión
+    // Create or retrieve conversation for this session
     if (!conversationHistory.has(sessionId)) {
       conversationHistory.set(sessionId, {
         step: 0,
@@ -97,31 +97,31 @@ export async function POST(req: NextRequest) {
     const conversation = conversationHistory.get(sessionId)!;
     let response: StoryResponse | undefined;
     
-    // Manejar diferentes acciones
+    // Handle different actions
     if (action === 'start') {
-      // Iniciar una nueva historia - Paso 1
+      // Start a new story - Step 1
       conversation.step = 1;
       conversation.lastChoice = null;
       conversation.narrativeHistory = [];
       conversation.choiceHistory = [];
       response = FALLBACK_CONTENT.step1;
     } else if (action === 'optionA' || action === 'optionB') {
-      // El usuario eligió una opción
+      // User chose an option
       conversation.step += 1;
       conversation.lastChoice = action === 'optionA' ? 'A' : 'B';
       
-      // Guardar la respuesta actual en el historial si hay una previa
+      // Save the current response in history if there's a previous one
       if (response) {
         conversation.narrativeHistory.push(response.narrative);
         conversation.choiceHistory.push(action === 'optionA' ? response.optionA : response.optionB);
       }
       
-      // FORZAR FINAL después del paso 8
+      // FORCE ENDING after step 8
       if (conversation.step > 8) {
         const endingKey = Math.random() > 0.5 ? 'step5a' : 'step5b';
         response = FALLBACK_CONTENT[endingKey];
       } else {
-        // Determinar la respuesta fallback basada en el paso actual y la elección
+        // Determine fallback response based on current step and choice
         const nextStepKey = `step${conversation.step}${conversation.lastChoice === 'A' ? 'a' : 'b'}`;
         
         // Safely access the fallback content
@@ -129,20 +129,20 @@ export async function POST(req: NextRequest) {
                   (conversation.step <= 8 ? FALLBACK_CONTENT[`step${conversation.step}a`] : FALLBACK_CONTENT.step5a);
       }
     } else {
-      return NextResponse.json({ error: 'Acción no válida' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
     
-    // Intentar obtener una respuesta de OpenAI si tenemos la API key
+    // Try to get a response from OpenAI if we have the API key
     if (process.env.NEXT_PUBLIC_OPENAI_API_KEY) {
       try {
-        // Intentar con OpenAI real, pero con un tiempo límite
+        // Try with real OpenAI, but with a time limit
         const timeout = new Promise((resolve) => {
           setTimeout(() => {
             resolve({ timedOut: true });
-          }, 5000); // 5 segundos de timeout
+          }, 5000); // 5 seconds timeout
         });
         
-        // Construir contexto completo de la historia para OpenAI
+        // Build complete story context for OpenAI
         const narrativeContext = conversation.narrativeHistory.length > 0 
           ? "Previous narrative:\n" + conversation.narrativeHistory.join("\n\n") 
           : "";
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           ? "Previous choices:\n" + conversation.choiceHistory.join("\n")
           : "";
         
-        // FORZAR EL FINAL después del paso 5
+        // FORCE ENDING after step 5
         let forceEnding = "";
         if (conversation.step >= 8) {
           forceEnding = "THIS IS THE FINAL STEP. The story MUST end here with either 'escaped' or 'death' as the outcome.";
@@ -210,7 +210,7 @@ Format response as JSON only with this structure:
           temperature: 0.4,
         });
         
-        // Usar Promise.race para implementar el timeout
+        // Use Promise.race to implement the timeout
         const result = await Promise.race([openAIPromise, timeout]) as any;
         
         if (!result.timedOut) {
@@ -218,7 +218,7 @@ Format response as JSON only with this structure:
           if (content) {
             const parsedResponse = JSON.parse(content) as StoryResponse;
             
-            // Forzar el resultado final en el paso 5
+            // Force final result at step 5
             if (conversation.step >= 5) {
               if (parsedResponse.outcome !== 'escaped' && parsedResponse.outcome !== 'death') {
                 parsedResponse.outcome = Math.random() > 0.5 ? 'escaped' : 'death';
@@ -229,12 +229,12 @@ Format response as JSON only with this structure:
           }
         }
       } catch (error) {
-        console.error("Error con OpenAI, usando respuesta de fallback:", error);
-        // Si falla OpenAI, continuamos con la respuesta de fallback
+        console.error("Error with OpenAI, using fallback response:", error);
+        // If OpenAI fails, we continue with the fallback response
       }
     }
     
-    // Si no tenemos respuesta por alguna razón, usamos una respuesta por defecto
+    // If we don't have a response for some reason, use a default response
     if (!response) {
       response = {
         narrative: "> SYSTEM: CONNECTION UNSTABLE\n\nThe cave trembles slightly around you. The path ahead is unclear, but you can sense that time is running out.\n\nSomething in the back of your mind warns you that you need to make a choice quickly before the situation gets worse.",
@@ -244,35 +244,34 @@ Format response as JSON only with this structure:
       };
     }
     
-    // Actualizar el historial
+    // Update history
     conversationHistory.set(sessionId, conversation);
     
-    // Retornar la respuesta en el formato esperado por el cliente
+    // Return response in the format expected by the client
     return NextResponse.json({
       narrative: response.narrative,
       options: [
-        { text: response.optionA, consequence: response.optionA },
-        { text: response.optionB, consequence: response.optionB }
+        { text: response.optionA },
+        { text: response.optionB }
       ],
       outcome: response.outcome
     });
-    
   } catch (error) {
-    console.error('Error en la API de historia:', error);
-    return NextResponse.json({ error: 'Error al generar la historia' }, { status: 500 });
+    console.error("API error:", error);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
 
-// Endpoint para verificar si el final es exitoso
+// Endpoint to check if the ending is successful
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const outcome = url.searchParams.get('outcome');
 
   if (!outcome) {
-    return NextResponse.json({ error: 'Falta el parámetro outcome' }, { status: 400 });
+    return NextResponse.json({ error: 'Missing outcome parameter' }, { status: 400 });
   }
 
-  // Determinar si el jugador ha escapado basado en el outcome
+  // Determine if the player has escaped based on the outcome
   const success = outcome === 'escaped';
   
   return NextResponse.json({ success });

@@ -84,6 +84,10 @@ export function BuyCartucho({ cartuchoId, cartuchoTitle, price, isOpen, onClose,
       if (!ownedCartuchos.includes(cartuchoId)) {
         ownedCartuchos.push(cartuchoId);
         localStorage.setItem('ownedCartuchos', JSON.stringify(ownedCartuchos));
+        
+        // Disparar evento personalizado para actualizar la UI
+        const purchasedEvent = new Event('cartuchosPurchased');
+        window.dispatchEvent(purchasedEvent);
       }
       
       onSuccess();
@@ -118,32 +122,32 @@ export function BuyCartucho({ cartuchoId, cartuchoTitle, price, isOpen, onClose,
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md border-2 border-orange-500 bg-gray-900 text-orange-300 rounded-xl">
+      <DialogContent className="sm:max-w-md glass-effect border-2 border-orange-500/70 text-orange-300 rounded-xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-orange-500/10 font-psygen">Purchase Cartucho</DialogTitle>
+          <DialogTitle className="text-2xl text-orange-500 font-psygen glow-orange-subtle">Purchase Cartucho</DialogTitle>
           <DialogDescription className="text-orange-400/80">
-            You're about to purchase access to {cartuchoTitle}
+            You need to purchase this experience before you can play it
           </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
-          <div className="flex justify-between items-center mb-4 p-3 bg-gray-800 rounded-lg border border-orange-500/30">
+          <div className="flex justify-between items-center mb-4 p-3 glass-bubble bg-gray-800/30 rounded-lg border border-orange-500/30">
             <span>Cartucho ID</span>
             <span className="font-bold">{cartuchoId}</span>
           </div>
           
-          <div className="flex justify-between items-center mb-4 p-3 bg-gray-800 rounded-lg border border-orange-500/30">
+          <div className="flex justify-between items-center mb-4 p-3 glass-bubble bg-gray-800/30 rounded-lg border border-orange-500/30">
             <span>Price</span>
             <span className="font-bold">{price} CAMP</span>
           </div>
           
-          <div className="flex justify-between items-center mb-4 p-3 bg-gray-800 rounded-lg border border-orange-500/30">
+          <div className="flex justify-between items-center mb-4 p-3 glass-bubble bg-gray-800/30 rounded-lg border border-orange-500/30">
             <span>Creator Royalty</span>
             <span className="font-bold">10%</span>
           </div>
           
           {balanceData && (
-            <div className="flex justify-between items-center mb-4 p-3 bg-gray-800 rounded-lg border border-orange-500/30">
+            <div className="flex justify-between items-center mb-4 p-3 glass-bubble bg-gray-800/30 rounded-lg border border-orange-500/30">
               <span>Your Balance</span>
               <span className={`font-bold ${hasEnoughBalance ? 'text-green-400' : 'text-red-400'}`}>
                 {parseFloat(balanceData.formatted).toFixed(4)} CAMP
@@ -151,8 +155,8 @@ export function BuyCartucho({ cartuchoId, cartuchoTitle, price, isOpen, onClose,
             </div>
           )}
           
-          <div className="bg-gray-800/50 p-3 rounded-lg border border-orange-500/20 text-sm">
-            <p>By purchasing this cartucho, you agree to the terms of use and acknowledge that a portion of the sale will go to the IP creator.</p>
+          <div className="glass-bubble bg-gray-800/20 p-3 rounded-lg border border-orange-500/20 text-sm">
+            <p>By purchasing this cartucho, you gain access to play the game. A portion of the sale will go to the IP creator.</p>
           </div>
         </div>
         

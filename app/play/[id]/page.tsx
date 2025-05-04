@@ -21,7 +21,7 @@ export default function PlayPage({ params }: PlayPageProps) {
   
   const { state, chooseOption, resetStory, setTimeRemaining } = useStory();
   
-  // Cuando se acaba el tiempo
+  // When time expires
   const handleTimeExpired = () => {
     setTimeExpired(true);
     setTimeout(() => {
@@ -29,7 +29,7 @@ export default function PlayPage({ params }: PlayPageProps) {
     }, 2000);
   };
   
-  // Si el juego termina, redirige al resultado apropiado
+  // If the game ends, redirect to appropriate result
   useEffect(() => {
     if (state.gameOver) {
       // Store the time remaining in localStorage before redirecting
@@ -85,22 +85,22 @@ export default function PlayPage({ params }: PlayPageProps) {
                 </div>
               ) : timeExpired ? (
                 <>
-                  <p className="text-red-500/70 text-2xl mb-4 font-psygen">¡TIEMPO AGOTADO!</p>
-                  <p className="mb-4">El calor se vuelve insoportable mientras las llamas consumen todo a tu alrededor.</p>
-                  <p className="mb-4">La cueva colapsa sobre ti, has muerto.</p>
+                  <p className="text-red-500/70 text-2xl mb-4 font-psygen">TIME'S UP!</p>
+                  <p className="mb-4">The heat becomes unbearable as the flames consume everything around you.</p>
+                  <p className="mb-4">The cave collapses on you. You have perished.</p>
                 </>
               ) : state.gameOver ? (
                 <>
                   <p className="text-2xl mb-4 font-psygen">
                     {state.success 
-                      ? <span className="text-orange-500/70">¡VICTORIA!</span>
-                      : <span className="text-red-500/70">DERROTA</span>
+                      ? <span className="text-orange-500/70">VICTORY!</span>
+                      : <span className="text-red-500/70">DEFEAT</span>
                     }
                   </p>
                   <p className="mb-4">
                     {state.success 
-                      ? "¡Has logrado escapar de la cueva! La luz del exterior te saluda mientras emerges victorioso."
-                      : "Tu viaje ha llegado a su fin, atrapado en las profundidades de la cueva para siempre."}
+                      ? "You've managed to escape the cave! The light of the outside world greets you as you emerge victorious."
+                      : "Your journey has come to an end, trapped in the depths of the cave forever."}
                   </p>
                 </>
               ) : state.error ? (
@@ -109,7 +109,7 @@ export default function PlayPage({ params }: PlayPageProps) {
                 <>
                   {state.storyHistory.length > 1 && (
                     <div className="mb-6 opacity-60 pb-4 border-b border-orange-500/30">
-                      <p className="italic mb-2">Decisión anterior: {state.storyHistory[state.storyHistory.length - 1].chosenOption}</p>
+                      <p className="italic mb-2">Previous decision: {state.storyHistory[state.storyHistory.length - 1].chosenOption}</p>
                     </div>
                   )}
                   <p className="mb-4">{state.currentSegment?.narrative}</p>

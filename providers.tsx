@@ -3,13 +3,12 @@
 import * as React from 'react';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WagmiProvider, createConfig, http } from 'wagmi';
-import { defineChain } from 'viem';
-import { mainnet, base } from 'wagmi/chains';
-import { getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { WagmiProvider } from 'wagmi';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { scrollSepolia, arbitrumSepolia, mantleTestnet } from '@/lib/nft-contract';
 
 // Define Base Camp testnet chain
-const baseCamp = defineChain({
+const baseCamp = {
   id: 123420001114,
   name: 'Base Camp',
   nativeCurrency: {
@@ -28,27 +27,33 @@ const baseCamp = defineChain({
       url: 'https://basecamp.cloud.blockscout.com',
     },
   },
-  testnet: true,
-});
+};
 
-// En un proyecto real, este valor debería estar en .env.local
-const projectId = "4caf3ff9196e663e8c573e00e20b1d0c";
+// Project ID from WalletConnect - required for WalletConnect v2
+const projectId = '2ca78ce11da4d0ae7aeaec9f21d0345c';
 
-const { connectors } = getDefaultWallets({
+// Create config with getDefaultConfig
+const config = getDefaultConfig({
   appName: 'The Hub',
   projectId: projectId,
-});
-
-const config = createConfig({
-  chains: [baseCamp, base, mainnet],
+  chains: [baseCamp, scrollSepolia, arbitrumSepolia, mantleTestnet],
   transports: {
-    [baseCamp.id]: http(),
-    [base.id]: http(),
-    [mainnet.id]: http(),
+    [baseCamp.id]: {
+      http: ['https://rpc.basecamp.t.raas.gelato.cloud', 'https://rpc-campnetwork.xyz'],
+    },
+    [scrollSepolia.id]: {
+      http: ['https://sepolia-rpc.scroll.io'],
+    },
+    [arbitrumSepolia.id]: {
+      http: ['https://sepolia-rollup.arbitrum.io/rpc'],
+    },
+    [mantleTestnet.id]: {
+      http: ['https://rpc.sepolia.mantle.xyz'],
+    },
   },
-  connectors,
 });
 
+// Create query client
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {

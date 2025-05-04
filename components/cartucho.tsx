@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { RainbowConnectModal } from "./rainbow-connect-modal"
 import { BuyCartucho } from "./buy-cartucho"
 import { useAccount } from "wagmi"
@@ -38,7 +38,11 @@ export function Cartucho({ cartucho }: CartuchoProps) {
 
   // Check if the user already owns this cartucho
   const checkOwnership = async () => {
-    if (!isConnected || !address) return false
+    if (!isConnected || !address) {
+      setIsOwned(false) // Si no hay wallet conectada, no lo posee
+      setIsChecking(false)
+      return false
+    }
     
     setIsChecking(true)
     try {
@@ -50,11 +54,22 @@ export function Cartucho({ cartucho }: CartuchoProps) {
       return owned
     } catch (error) {
       console.error("Error checking cartucho ownership:", error)
+      setIsOwned(false)
       return false
     } finally {
       setIsChecking(false)
     }
   }
+  
+  // Check ownership when component mounts or when wallet connection changes
+  useEffect(() => {
+    // Pequeño retraso para asegurar que esto ocurra después del renderizado
+    const timer = setTimeout(() => {
+      checkOwnership();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [isConnected, address]);
   
   const handlePlay = async () => {
     // Don't do anything if it's a coming soon cartucho
@@ -67,20 +82,31 @@ export function Cartucho({ cartucho }: CartuchoProps) {
       return
     }
     
-    // If we haven't checked ownership yet, do so now
-    if (isOwned === null) {
-      const owned = await checkOwnership()
-      if (!owned) {
-        setShowBuyDialog(true)
-        return
-      }
-    } else if (!isOwned) {
+    // Verificar propiedad siempre cuando se intenta jugar
+    const owned = await checkOwnership()
+    
+    // Si tiene precio y no lo posee, mostrar diálogo de compra
+    if (cartucho.price && !owned) {
       setShowBuyDialog(true)
       return
     }
     
-    // If we reach here, the user owns the cartucho and can play
-    setShowWalletModal(true)
+    // Solo permitir jugar si es gratuito o si lo posee
+    if (!cartucho.price || owned) {
+      setShowWalletModal(true)
+    }
+  }
+
+  const handleWalletConnected = () => {
+    // Después de conectar la wallet, verificamos propiedad
+    checkOwnership().then(owned => {
+      if (!owned && cartucho.price) {
+        // Si no es propietario y tiene precio, mostrar diálogo de compra
+        setTimeout(() => {
+          setShowBuyDialog(true);
+        }, 500);
+      }
+    });
   }
   
   const handleBuySuccess = () => {
@@ -96,7 +122,7 @@ export function Cartucho({ cartucho }: CartuchoProps) {
 
   return (
     <>
-      <div className="border-2 border-orange-500 bg-gray-900 p-6 rounded-xl transition-all hover:scale-[1.01] hover:border-orange-400 relative overflow-hidden hover:shadow-[inset_0_0_8px_rgba(255,128,0,0.3),0_0_15px_rgba(255,128,0,0.2)]">
+      <div className="glass-card border-2 border-orange-500/70 p-6 rounded-xl transition-all hover:scale-[1.01] relative overflow-hidden hover:shadow-[inset_0_0_8px_rgba(255,128,0,0.3),0_0_15px_rgba(255,128,0,0.2)]">
         <div className="flex flex-col md:flex-row gap-6 relative z-10">
           {/* Cartucho "cartridge" visual */}
           <div className="flex-shrink-0 w-full md:w-44 h-44 bg-transparent flex items-center justify-center rounded-lg relative overflow-hidden group">
@@ -113,20 +139,20 @@ export function Cartucho({ cartucho }: CartuchoProps) {
           </div>
 
           <div className="flex-1">
-            <h2 className="text-3xl font-bold text-orange-500 tracking-wider mb-2 font-psygen">{cartucho.title}</h2>
+            <h2 className="text-3xl font-bold text-orange-500 tracking-wider mb-2 font-psygen glow-orange-subtle">{cartucho.title}</h2>
 
             <p className="text-orange-300 mb-6 leading-relaxed">{cartucho.description}</p>
 
             <div className="flex flex-wrap justify-between items-center gap-4">
               <div className="flex gap-4">
-                <span className="px-3 py-1 bg-gray-800 text-orange-300 text-sm rounded-full border border-orange-500/30">
+                <span className="glass-bubble px-3 py-1 text-orange-300 text-sm rounded-full border border-orange-500/30">
                   DIFF: {cartucho.difficulty}
                 </span>
-                <span className="px-3 py-1 bg-gray-800 text-orange-300 text-sm rounded-full border border-orange-500/30">
+                <span className="glass-bubble px-3 py-1 text-orange-300 text-sm rounded-full border border-orange-500/30">
                   TIME: {cartucho.timeEstimate}
                 </span>
                 {cartucho.price && !cartucho.comingSoon && (
-                  <span className="px-3 py-1 bg-gray-800 text-green-300 text-sm rounded-full border border-orange-500/30">
+                  <span className="glass-bubble px-3 py-1 text-green-300 text-sm rounded-full border border-orange-500/30">
                     PRICE: {cartucho.price} CAMP
                   </span>
                 )}
@@ -168,7 +194,9 @@ export function Cartucho({ cartucho }: CartuchoProps) {
       {showWalletModal && !cartucho.comingSoon && (
         <RainbowConnectModal 
           cartuchoId={cartucho.id} 
-          onClose={() => setShowWalletModal(false)} 
+          onClose={() => setShowWalletModal(false)}
+          redirectToGame={true}
+          onConnected={handleWalletConnected}
         />
       )}
       

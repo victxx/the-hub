@@ -24,11 +24,16 @@ export async function generateStorySegment(
 }
 
 export async function isEndingSuccessful(situation: string): Promise<boolean> {
-  // Determina el éxito basado en palabras clave
-  return situation.toLowerCase().includes('escapado') || 
+  // Determine success based on keywords in English
+  return situation.toLowerCase().includes('escaped') || 
+         situation.toLowerCase().includes('exit') || 
+         situation.toLowerCase().includes('escape') || 
+         situation.toLowerCase().includes('outside') ||
+         // Keep Spanish keywords for backward compatibility
+         situation.toLowerCase().includes('escapado') || 
          situation.toLowerCase().includes('salida') || 
-             situation.toLowerCase().includes('escapar') || 
-             situation.toLowerCase().includes('exterior');
+         situation.toLowerCase().includes('escapar') || 
+         situation.toLowerCase().includes('exterior');
 }
 
 // Función para proporcionar datos de muestra cuando no hay API key
@@ -60,7 +65,7 @@ function getMockStoryData(currentSituation: string): {
       options: [
         { 
           text: "DASH THROUGH THE FIRE WALL", 
-          consequence: "Taking a deep breath, you sprint directly into the wall of flames. For a moment, there is only searing heat and blinding light. Then, suddenly, cool air - you've made it through! The exit portal glows before you, your escape route now clear. Has escapado." 
+          consequence: "Taking a deep breath, you sprint directly into the wall of flames. For a moment, there is only searing heat and blinding light. Then, suddenly, cool air - you've made it through! The exit portal glows before you, your escape route now clear. You have escaped." 
         },
         { 
           text: "EXAMINE THE TERMINAL", 
@@ -77,11 +82,11 @@ function getMockStoryData(currentSituation: string): {
       options: [
         { 
           text: "SPRINT THROUGH THE OPENING", 
-          consequence: "You dash through the corridor in the flames. The heat licks at your sides but can't touch you. Just as the opening begins to close, you leap through to the other side, landing safely. The exit portal awaits just ahead. Has escapado." 
+          consequence: "You dash through the corridor in the flames. The heat licks at your sides but can't touch you. Just as the opening begins to close, you leap through to the other side, landing safely. The exit portal awaits just ahead. You have escaped." 
         },
         { 
           text: "ATTEMPT TO STABILIZE THE BREACH", 
-          consequence: "You turn back to the terminal, fingers flying over the interface trying to lock the breach open. A sudden surge of energy from the system overwhelms your attempt. The terminal explodes in a shower of sparks, and the flames rush in from all sides. Has muerto." 
+          consequence: "You turn back to the terminal, fingers flying over the interface trying to lock the breach open. A sudden surge of energy from the system overwhelms your attempt. The terminal explodes in a shower of sparks, and the flames rush in from all sides. You have died." 
         }
       ]
     };
@@ -111,7 +116,7 @@ function getMockStoryData(currentSituation: string): {
       options: [
         { 
           text: "TAKE THE DIRECT PATH", 
-          consequence: "Trusting in the crystal's protection, you stride confidently through the heart of the inferno. The shield holds, keeping you safe as you navigate straight to the exit portal. In minutes, you've reached it - the way out is clear. Has escapado." 
+          consequence: "Trusting in the crystal's protection, you stride confidently through the heart of the inferno. The shield holds, keeping you safe as you navigate straight to the exit portal. In minutes, you've reached it - the way out is clear. You have escaped." 
         },
         { 
           text: "CHOOSE THE SAFER PERIMETER", 
@@ -128,11 +133,11 @@ function getMockStoryData(currentSituation: string): {
       options: [
         { 
           text: "MAKE A RUN FOR THE EXIT", 
-          consequence: "Deciding there's no time to waste, you sprint toward the exit portal. The crystal's shield flickers and fails just as you reach the wall of flame. You feel the heat sear through you for a brief, terrible moment - then you're through, tumbling out into safety. Has escapado." 
+          consequence: "Deciding there's no time to waste, you sprint toward the exit portal. The crystal's shield flickers and fails just as you reach the wall of flame. You feel the heat sear through you for a brief, terrible moment - then you're through, tumbling out into safety. You have escaped." 
         },
         { 
           text: "DETOUR TO THE COOLING STATION", 
-          consequence: "You veer toward the cooling station, hoping to recharge the crystal. As you reach it, the system triggers a lockdown. Steel barriers slam down, trapping you. The flames slowly encroach as the oxygen is systematically removed from your section. Has muerto." 
+          consequence: "You veer toward the cooling station, hoping to recharge the crystal. As you reach it, the system triggers a lockdown. Steel barriers slam down, trapping you. The flames slowly encroach as the oxygen is systematically removed from your section. You have died." 
         }
       ]
     };
@@ -145,11 +150,11 @@ function getMockStoryData(currentSituation: string): {
       options: [
         { 
           text: "CIRCLE AROUND THE PILLAR", 
-          consequence: "Following the symbols, you carefully make your way around the energy pillar. As you approach the exit, the system suddenly recognizes your presence. 'CANDIDATE VERIFIED. ACCESS GRANTED.' The portal stabilizes, allowing you safe passage. Has escapado." 
+          consequence: "Following the symbols, you carefully make your way around the energy pillar. As you approach the exit, the system suddenly recognizes your presence. 'CANDIDATE VERIFIED. ACCESS GRANTED.' The portal stabilizes, allowing you safe passage. You have escaped." 
         },
         { 
           text: "WALK THROUGH THE ENERGY PILLAR", 
-          consequence: "Trusting the ancient symbols, you step directly into the pillar of energy. Your body tingles as data flows through you, reading, scanning - judging. For a moment, you're suspended in pure information, before being violently rejected. The system has deemed you unworthy. Has muerto." 
+          consequence: "Trusting the ancient symbols, you step directly into the pillar of energy. Your body tingles as data flows through you, reading, scanning - judging. For a moment, you're suspended in pure information, before being violently rejected. The system has deemed you unworthy. You have died." 
         }
       ]
     };
@@ -161,11 +166,11 @@ function getMockStoryData(currentSituation: string): {
     options: [
       { 
         text: "ENTER THE BLUE DOORWAY", 
-        consequence: "The blue doorway envelops you in cool energy, instantly relieving you from the heat. You find yourself in a serene data stream that carries you safely to the exit portal. The trial recognizes your choice as wisdom. Has escapado." 
+        consequence: "The blue doorway envelops you in cool energy, instantly relieving you from the heat. You find yourself in a serene data stream that carries you safely to the exit portal. The trial recognizes your choice as wisdom. You have escaped." 
       },
       { 
         text: "ENTER THE RED DOORWAY", 
-        consequence: "The red doorway intensifies the heat to unbearable levels as you step through. The system voice announces: \"RECALIBRATION FAILED. PURGING ANOMALY.\" You feel your digital consciousness being systematically erased. Has muerto." 
+        consequence: "The red doorway intensifies the heat to unbearable levels as you step through. The system voice announces: \"RECALIBRATION FAILED. PURGING ANOMALY.\" You feel your digital consciousness being systematically erased. You have died." 
       }
     ]
   };

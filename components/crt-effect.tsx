@@ -36,7 +36,7 @@ export function CrtEffect({ children }: CrtEffectProps) {
         }
 
         .crt-container {
-          background-color: #000;
+          background: linear-gradient(to right, rgb(31, 41, 55), rgb(11, 15, 25), rgb(0, 0, 0));
           overflow: hidden;
           position: relative;
           min-height: 100vh;
