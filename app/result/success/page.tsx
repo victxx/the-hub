@@ -4,6 +4,7 @@ import { CrtEffect } from "@/components/crt-effect"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useStory } from "@/hooks/use-story"
+import { Logo } from "@/components/logo"
 
 export default function SuccessResultPage() {
   const { state } = useStory();
@@ -40,11 +41,15 @@ export default function SuccessResultPage() {
 
   return (
     <CrtEffect>
-      <main className="min-h-screen bg-black text-orange-400 font-mono p-4 md:p-8 flex flex-col items-center justify-center relative">
-        <div className="container mx-auto max-w-2xl text-center relative z-10">
+      <main className="min-h-screen bg-black text-orange-400 font-mono p-4 md:p-8 flex flex-col items-center relative">
+        <div className="w-full max-w-2xl mb-8">
+          <Logo width={150} height={50} />
+        </div>
+        
+        <div className="container mx-auto max-w-2xl text-center relative z-10 flex-1 flex flex-col justify-center">
           {/* Result animation */}
           <div className="mb-12 relative">
-            <div className="text-6xl md:text-8xl font-bold text-orange-500 glow-orange mb-8 tracking-wider animate-pulse">
+            <div className="text-6xl md:text-8xl font-bold text-orange-500/70 glow-orange mb-8 tracking-wider animate-pulse font-psygen">
               SURVIVOR
             </div>
           </div>

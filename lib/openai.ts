@@ -5,7 +5,7 @@ import OpenAI from 'openai';
 const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || '';
 
 if (!apiKey) {
-  console.error('⚠️ NEXT_PUBLIC_OPENAI_API_KEY no configurada. Por favor añade tu clave API de OpenAI en .env.local');
+  console.error('-');
 }
 
 export const openai = new OpenAI({

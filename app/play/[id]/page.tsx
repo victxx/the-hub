@@ -6,6 +6,7 @@ import Link from "next/link"
 import { GameTimer } from "@/components/game-timer"
 import { useRouter } from "next/navigation"
 import { useStory } from "@/hooks/use-story"
+import { Logo } from "@/components/logo"
 
 interface PlayPageProps {
   params: {
@@ -48,7 +49,7 @@ export default function PlayPage({ params }: PlayPageProps) {
         <div className="container mx-auto flex-1 flex flex-col relative z-10">
           {/* Header with timer */}
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-orange-500 glow-orange">TRIAL OF FIRE</h1>
+            <Logo width={150} height={50} />
             {!timeExpired && !state.gameOver && (
               <GameTimer 
                 initialTime={300} 
@@ -84,16 +85,24 @@ export default function PlayPage({ params }: PlayPageProps) {
                 </div>
               ) : timeExpired ? (
                 <>
-                  <p className="text-red-500 text-2xl mb-4">¡TIEMPO AGOTADO!</p>
+                  <p className="text-red-500/70 text-2xl mb-4 font-psygen">¡TIEMPO AGOTADO!</p>
                   <p className="mb-4">El calor se vuelve insoportable mientras las llamas consumen todo a tu alrededor.</p>
                   <p className="mb-4">La cueva colapsa sobre ti, has muerto.</p>
                 </>
               ) : state.gameOver ? (
-                <p className="mb-4">
-                  {state.success 
-                    ? "¡Has logrado escapar de la cueva! La luz del exterior te saluda mientras emerges victorioso."
-                    : "Tu viaje ha llegado a su fin, atrapado en las profundidades de la cueva para siempre."}
-                </p>
+                <>
+                  <p className="text-2xl mb-4 font-psygen">
+                    {state.success 
+                      ? <span className="text-orange-500/70">¡VICTORIA!</span>
+                      : <span className="text-red-500/70">DERROTA</span>
+                    }
+                  </p>
+                  <p className="mb-4">
+                    {state.success 
+                      ? "¡Has logrado escapar de la cueva! La luz del exterior te saluda mientras emerges victorioso."
+                      : "Tu viaje ha llegado a su fin, atrapado en las profundidades de la cueva para siempre."}
+                  </p>
+                </>
               ) : state.error ? (
                 <p className="text-red-500">Error: {state.error}</p>
               ) : (

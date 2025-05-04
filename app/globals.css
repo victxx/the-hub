@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Psygen';
+  src: url('/Psygen.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -124,7 +132,7 @@ body {
 }
 
 .glow-orange {
-  text-shadow: 0 0 5px #ff8000, 0 0 10px #ff8000, 0 0 15px #ff8000, 0 0 20px #ff8000;
+  text-shadow: 0 0 10px rgba(249,115,22,0.5), 0 0 20px rgba(249,115,22,0.3);
 }
 
 .glow-orange-light {
@@ -189,4 +197,25 @@ body {
   background-image: repeating-linear-gradient(to bottom, #ff8000 0%, #ff8000 50%, transparent 50%, transparent 100%);
   background-size: 1px 20px;
   background-repeat: repeat-y;
+}
+
+@layer utilities {
+  .font-psygen {
+    font-family: 'Psygen', monospace;
+  }
+  
+  @keyframes pulse-slow {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.85;
+      transform: scale(0.97);
+    }
+  }
+  
+  .animate-pulse-slow {
+    animation: pulse-slow 5s ease-in-out infinite;
+  }
 }

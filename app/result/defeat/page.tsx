@@ -3,28 +3,64 @@
 import { CrtEffect } from "@/components/crt-effect"
 import Link from "next/link"
 import { useState } from "react"
+import { registerCartucho } from "@/lib/contract"
+import { useAccount } from "wagmi"
+import { toast } from "sonner"
+import { Logo } from "@/components/logo"
 
 export default function DefeatResultPage() {
   const [minting, setMinting] = useState(false)
   const [minted, setMinted] = useState(false)
+  const [txHash, setTxHash] = useState<string | null>(null)
+  const { address } = useAccount()
 
-  const handleMintNFT = () => {
-    setMinting(true)
-
-    // Simulate minting process
-    setTimeout(() => {
-      setMinting(false)
-      setMinted(true)
-    }, 2000)
-  }
+  const handleMintNFT = async () => {
+    if (!address) {
+      toast.error("Please connect your wallet to mint an NFT");
+      return;
+    }
+    
+    setMinting(true);
+    
+    try {
+      // IPFS CID suffix of the JSON metadata of the NFT (would need to be stored on IPFS first)
+      const cidSuffix = "bafybeihsvpxlhwzb4xzqfvqm7gyxaqgqkvzkerkf563q6evubage2v2dna.json";
+      
+      // Allow commercial use, disallow derivative works, expire in 30 days
+      const allowCommercialUse = true;
+      const allowDerivativeWorks = false;
+      const expiry = Math.floor(Date.now()/1000) + 30*24*3600; // 30 days from now
+      
+      const hash = await registerCartucho(
+        address,             // The connected user's address
+        cidSuffix,           // IPFS CID suffix
+        allowCommercialUse,  // Allow commercial use
+        allowDerivativeWorks, // Don't allow derivative works
+        expiry               // Expiry timestamp
+      );
+      
+      setTxHash(hash);
+      setMinted(true);
+      toast.success("NFT minted successfully!");
+    } catch (error) {
+      console.error("Error minting NFT:", error);
+      toast.error("Failed to mint NFT. Please try again.");
+    } finally {
+      setMinting(false);
+    }
+  };
 
   return (
     <CrtEffect>
-      <main className="min-h-screen bg-black text-orange-400 font-mono p-4 md:p-8 flex flex-col items-center justify-center relative">
-        <div className="container mx-auto max-w-2xl text-center relative z-10">
+      <main className="min-h-screen bg-black text-orange-400 font-mono p-4 md:p-8 flex flex-col items-center relative">
+        <div className="w-full max-w-2xl mb-8">
+          <Logo width={150} height={50} />
+        </div>
+        
+        <div className="container mx-auto max-w-2xl text-center relative z-10 flex-1 flex flex-col justify-center">
           {/* Result animation */}
           <div className="mb-12 relative">
-            <div className="text-6xl md:text-8xl font-bold text-red-500 glow-orange mb-8 tracking-wider animate-pulse">
+            <div className="text-6xl md:text-8xl font-bold text-red-500/70 glow-orange mb-8 tracking-wider animate-pulse font-psygen">
               DEFEAT
             </div>
           </div>
@@ -64,6 +100,16 @@ export default function DefeatResultPage() {
             {minted && (
               <p className="text-green-400 text-sm">
                 Your FALLEN NFT has been minted to your wallet as a reminder of your defeat.
+                {txHash && (
+                  <a 
+                    href={`https://basecamp.cloud.blockscout.com/tx/${txHash}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="underline ml-1"
+                  >
+                    View on Blockscout
+                  </a>
+                )}
               </p>
             )}
           </div>
