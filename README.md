@@ -6,9 +6,9 @@
 
 ## Contract Addresses
 
-- Base Camp Testnet: `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512`
+- Base Camp Testnet: `0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512` ([Verification](https://basecamp.cloud.blockscout.com//address/0x3Bf712949b4C5376F8b3fcd004BEf974F0702D62?tab=contract))
 - Scroll Sepolia: `0x8A791620dd6260079BF849Dc5567aDC3F2FdC318`
-- Arbitrum (Coming Soon)
+- Arbitrum Sepolia: `0x503E011a8Fb7f4D3CF31cA777C8a838504e7f18E` ([Verification](https://testnet.routescan.io/address/0x503E011a8Fb7f4D3CF31cA777C8a838504e7f18E/contract/421614/code))
 - Mantle (Coming Soon)
 
 ## What Problem Does It Solve?

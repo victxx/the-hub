@@ -104,7 +104,7 @@ export const supportedNFTNetworks = [
 // GameOutcomeNFT contract addresses on different networks
 const contractAddresses: Record<number, `0x${string}`> = {
   [scrollSepolia.id]: '0x503E011a8Fb7f4D3CF31cA777C8a838504e7f18E' as `0x${string}`,
-  [arbitrumSepolia.id]: '0x503E011a8Fb7f4D3CF31cA777C8a838504e7f18E' as `0x${string}`, // Update this with the actual contract address
+  [arbitrumSepolia.id]: '0x503E011a8Fb7f4D3CF31cA777C8a838504e7f18E' as `0x${string}`, // Verified contract address
   [mantleTestnet.id]: '0x503E011a8Fb7f4D3CF31cA777C8a838504e7f18E' as `0x${string}`, // Update this with the actual contract address
 };
 
